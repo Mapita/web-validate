@@ -5,7 +5,8 @@ class Validator{
     static add(...validators){
         let validator;
         for(let validator of validators){
-            validator = validator || this.addOne(validator);
+            const next = this.addOne(validator);
+            validator = validator || next;
         }
         return validator;
     }
