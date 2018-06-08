@@ -3,7 +3,17 @@
   "version": "1.0.0",
   "description": "Validate API requests and responses.",
   "keywords": [
-    "api", "request", "response", "server", "validate", "validation", "data", "schema", "specification", "express", "node"
+    "api",
+    "request",
+    "response",
+    "server",
+    "validate",
+    "validation",
+    "data",
+    "schema",
+    "specification",
+    "express",
+    "node"
   ],
   "homepage": "https://github.com/Mapita/web-validate",
   "license": "MIT",
@@ -29,5 +39,6 @@
     }
   ],
   "scripts": {
+    "test": "node test/canary-test.js"
   }
 }
