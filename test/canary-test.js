@@ -9,13 +9,18 @@ function throwsErrorWith(callback, string){
         }else if(error.message){
             assert.fail(
                 `Error message "${error.message}" ` +
-                `doesn't contain the string "${string}".`
+                `doesn't contain the string "${string}". ` +
+                `Stack trace:\n${error.stack}`
             );
         }else{
             assert.fail("Caught error object has no message.");
         }
     }
     assert.fail("No error thrown.");
+}
+
+function assertIsNaN(value){
+    assert(value !== value, `Value ${value} isn't NaN.`);
 }
 
 function makeTests(validate){
@@ -57,6 +62,28 @@ function makeTests(validate){
             throwsErrorWith(() => validate.strict(spec, 0),
                 "Value isn't a boolean"
             );
+        });
+    });
+    
+    canary.group("numeric validator", function(){
+        const spec = {"type": "numeric"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, 0), 0);
+            assert.equal(validate.value(spec, 1.5), 1.5);
+            assert.equal(validate.value(spec, "-20"), -20);
+            assert.equal(validate.value(spec, Infinity), Infinity);
+            assertIsNaN(validate.value(spec, NaN));
+            assertIsNaN(validate.value(spec, "NaN"));
+            throwsErrorWith(() => validate.value(spec, []), "Value isn't numeric");
+            throwsErrorWith(() => validate.value(spec, "!?"), "Value isn't numeric");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, 0), 0);
+            assert.equal(validate.strict(spec, 1.5), 1.5);
+            assert.equal(validate.strict(spec, Infinity), Infinity);
+            assertIsNaN(validate.strict(spec, NaN));
+            throwsErrorWith(() => validate.strict(spec, "1"), "Value isn't numeric");
+            throwsErrorWith(() => validate.strict(spec, "NaN"), "Value isn't numeric");
         });
     });
     
