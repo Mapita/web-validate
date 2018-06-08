@@ -30,7 +30,11 @@ ValidationError.prototype.constructor = ValidationError;
 
 // Helpful methods
 ValidationError.prototype.getMessage = function(){
-    return "Expected " + this.validator.describe() + " at " + this.path + ": " + this.reason;
+    return (
+        `Expected ${this.validator.describe()}` +
+        (this.path && this.path.parent ? ` at ${this.path}` : "") +
+        `: ${this.reason}`
+    );
 };
 ValidationError.toJSON = function(){
     return {
