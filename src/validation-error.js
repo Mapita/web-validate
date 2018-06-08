@@ -1,6 +1,9 @@
 // The assertion-error package was used as a basis for the ValidationError type
 // https://github.com/chaijs/assertion-error/blob/master/index.js
 
+// These are the errors that are thrown in user code to serve as a controlled
+// and informative validation error.
+
 // The constructor
 function ValidationError(specification, actual, path, strict, validator, reason){
     Error.call(this);
@@ -31,7 +34,7 @@ ValidationError.prototype.constructor = ValidationError;
 // Helpful methods
 ValidationError.prototype.getMessage = function(){
     return (
-        `Expected ${this.validator.describe()}` +
+        `Expected ${this.validator.describe(this.specification)}` +
         (this.path && this.path.parent ? ` at ${this.path}` : "") +
         `: ${this.reason}`
     );

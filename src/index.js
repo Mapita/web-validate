@@ -1,7 +1,8 @@
 // Important classes
+const Validator = require("./validator");
+const ValidatorError = require("./validator-error");
 const ValidationError = require("./validation-error");
 const ValidationPath = require("./validation-path");
-const Validator = require("./validator");
 
 // Validation functions
 const validateValue = require("./validate-value");
@@ -41,6 +42,7 @@ const validateExport = {
     objectStrict: validateObjectStrict,
     attributesStrict: validateAttributesStrict,
     Error: ValidationError,
+    ValidatorError: ValidatorError,
     Path: ValidationPath,
     Validator: Validator,
     copyWithoutSensitive: copyWithoutSensitive,

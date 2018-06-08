@@ -1,4 +1,5 @@
 const Validator = require("./validator");
+const ValidatorError = require("./validator-error");
 const ValidationError = require("./validation-error");
 const ValidationPath = require("./validation-path");
 
@@ -18,7 +19,9 @@ function validateValue(specification, value, path, strict){
     try{
         return validator.validate(specification, value, path, strict);
     }catch(error){
-        if(error instanceof ValidationError){
+        if(error instanceof ValidationError || !(
+            error instanceof ValidatorError
+        )){
             throw error;
         }else{
             throw new ValidationError(
