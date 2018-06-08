@@ -1,7 +1,8 @@
 const validateValue = require("./validate-value");
 
 // Helper to validate an object
-function validateObject(specification, path, object, response){
+function validateObject(specification, object, path, strict){
+    path = path || new ValidationPath();
     // Check that the input is really some kind of object
     if(typeof(object) !== "object"){
         throw new Error("Value isn't an object.");
@@ -30,9 +31,9 @@ function validateObject(specification, path, object, response){
                 specification,
                 path.getNextPath(key),
                 object[key],
-                response
+                strict
             );
-        }else if(response){
+        }else if(strict){
             throw new Error(`Extra attribute "${key}".`);
         }
     }

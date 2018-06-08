@@ -3,7 +3,7 @@ const inspect = require("util").inspect;
 const Validator = require("./validator");
 
 const validateList = require("./validate-list");
-const validateList = require("./validate-object");
+const validateObject = require("./validate-object");
 
 // Helper for number validators
 function describeNumberValidator(name, specification){
@@ -91,7 +91,7 @@ const anyValidator = Validator.add({
     describe: function(specification){
         return "any value";
     },
-    validate: function(specification, path, value, response){
+    validate: function(specification, value, path, strict){
         return value;
     },
 });
@@ -104,8 +104,8 @@ const booleanValidator = Validator.add({
     describe: function(specification){
         return "a boolean";
     },
-    validate: function(specification, path, value, response){
-        if(response && value !== true && value !== false){
+    validate: function(specification, value, path, strict){
+        if(strict && value !== true && value !== false){
             throw new Error("Value isn't a boolean.");
         }
         return !!value;
@@ -127,8 +127,8 @@ const numericValidator = Validator.add({
     describe: function(specification){
         return describeNumberValidator("a numeric value", specification);
     },
-    validate: function(specification, path, value, response){
-        const number = response ? value : +value;
+    validate: function(specification, value, path, strict){
+        const number = strict ? value : +value;
         if(typeof(number) !== "number"){
             throw new Error("Value isn't numeric.");
         }
@@ -154,9 +154,9 @@ const numberValidator = Validator.add({
     describe: function(specification){
         return describeNumberValidator("a finite number", specification);
     },
-    validate: function(specification, path, value, response){
+    validate: function(specification, value, path, strict){
         const number = numericValidator.validate(
-            specification, path, value, response
+            specification, value, path, strict
         );
         if(!Number.isFinite(number)){
             throw new Error("Value isn't a finite number.");
@@ -174,9 +174,9 @@ const integerValidator = Validator.add({
     describe: function(specification){
         return describeNumberValidator("an integer", specification);
     },
-    validate: function(specification, path, value, response){
+    validate: function(specification, value, path, strict){
         const number = numberValidator.validate(
-            specification, path, value, response
+            specification, value, path, strict
         );
         if(!Number.isInteger(number)){
             throw new Error("Value isn't an integer.");
@@ -195,9 +195,9 @@ const indexValidator = Validator.add({
     describe: function(specification){
         return describeNumberValidator("a non-negative integer index", specification);
     },
-    validate: function(specification, path, value, response){
+    validate: function(specification, value, path, strict){
         const number = integerValidator.validate(
-            specification, path, value, response
+            specification, value, path, strict
         );
         if(number < 0){
             throw new Error("Value is less than zero.");
@@ -219,13 +219,13 @@ const stringValidator = Validator.add({
     },
     describe: function(specification){
         const base = describeListValidator("a string", "characters", specification);
-        if(specification.pattern){
-            return (base +
-                ` and matching the regular expression /${specification.pattern}/`
-            );
+        if(specification.pattern) return (base +
+            ` and matching the regular expression /${specification.pattern}/`
+        );
+        else return base;
     },
-    validate: function(specification, path, value, response){
-        if(response && typeof(value) !== "string"){
+    validate: function(specification, value, path, strict){
+        if(strict && typeof(value) !== "string"){
             throw new Error("Value isn't a string.");
         }
         value = validateListLength("String", specification, String(value));
@@ -249,8 +249,8 @@ const emailAddressValidator = Validator.add({
     describe: function(specification){
         return "an email address";
     },
-    validate: function(specification, path, value, response){
-        if(response && typeof(value) !== "string"){
+    validate: function(specification, value, path, strict){
+        if(strict && typeof(value) !== "string"){
             throw new Error("Value isn't a string.");
         }
         const email = String(value).toLowerCase();
@@ -290,7 +290,7 @@ const timestampValidator = Validator.add({
             return "a timestamp";
         }
     },
-    validate: function(specification, path, value, response){
+    validate: function(specification, value, path, strict){
         let date;
         try{
             date = getDate(value);
@@ -331,13 +331,13 @@ const enumValidator = Validator.add({
             );
         }
     },
-    validate: function(specification, path, value, response){
+    validate: function(specification, value, path, strict){
         if(!Array.isArray(specification.options) || !specification.options.length){
             throw new Error("Enumeration accepts no values.");
         }
         for(let option of specification.options){
             if(value === option || (value !== value && option !== option) || (
-                !response && String(value) === option || +value === option
+                !strict && String(value) === option || +value === option
             )){
                 return option;
             }
@@ -363,8 +363,8 @@ const listValidator = Validator.add({
     describe: function(specification){
         return describeListValidator("a list", "elements", specification);
     },
-    validate: function(specification, path, value, response){
-        return validateList(specification, path, value, response);
+    validate: function(specification, value, path, strict){
+        return validateList(specification, value, path, strict);
     },
 });
 
@@ -381,7 +381,7 @@ const objectValidator = Validator.add({
     describe: function(specification){
         return describeListValidator("an object");
     },
-    validate: function(specification, path, value, response){
-        return validateObject(specification, path, value, response);
+    validate: function(specification, value, path, strict){
+        return validateObject(specification, value, path, strict);
     },
 });

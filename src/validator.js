@@ -24,12 +24,17 @@ class Validator{
     constructor(options){
         this.name = options.name;
         this.parameters = options.parameters || {};
-        this.describe = options.describe || () => "something";
-        this.validate = (options.validate ||
+        this.describe = options.describe || Validator.defaultDescribeFunction;
+        this.validate = (options.validate || (
             (specification, path, value, response) => value
-        );
+        ));
     }
 }
+
+// Used when a description function isn't provided.
+Validator.defaultDescribeFunction = function(){
+    return `some ${this.name}`
+};
 
 // Map validators by name; this is used to look up validators
 // by the name provided in a specification object.

@@ -2,11 +2,11 @@
 // https://github.com/chaijs/assertion-error/blob/master/index.js
 
 // The constructor
-function ValidationError(specification, path, response, actual, validator, reason){
+function ValidationError(specification, actual, path, strict, validator, reason){
     Error.call(this);
     this.specification = specification;
     this.path = path;
-    this.response = response;
+    this.strict = strict;
     this.actual = actual;
     this.validator = validator;
     this.reason = reason;
@@ -36,7 +36,7 @@ ValidationError.toJSON = function(){
     return {
         specification: this.specification,
         path: this.path,
-        response: this.response,
+        strict: this.strict,
         actual: this.actual,
         validator: this.validator,
         reason: this.reason,

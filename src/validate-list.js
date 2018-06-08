@@ -1,7 +1,8 @@
 const validateValue = require("./validate-value");
 
 // Helper to validate a list of values
-function validateList(specification, path, list, response){
+function validateList(specification, list, path, strict){
+    path = path || new ValidationPath();
     // Check that the input is really some kind of list (i.e. is iterable)
     if(!list || !list[Symbol.iterator] ||
         !(list[Symbol.iterator] instanceof Function)
@@ -25,7 +26,7 @@ function validateList(specification, path, list, response){
                 specification.each,
                 path.getNextPath(validatedArray.length),
                 element,
-                response,
+                strict,
             ));
         }else{
             validatedArray.push(element);

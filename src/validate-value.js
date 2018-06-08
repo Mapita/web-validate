@@ -2,7 +2,8 @@ const ValidationError = require("./validation-error");
 const ValidationPath = require("./validation-path");
 
 // Validate a single value of any type
-function validateValue(specification, path, value, response){
+function validateValue(specification, value, path, strict){
+    path = path || new ValidationPath();
     const validator = specification.validator || (
         NamedValidators[specification.type]
     );
@@ -12,13 +13,13 @@ function validateValue(specification, path, value, response){
         throw new Error("Invalid validator.");
     }
     try{
-        return validator.validate(specification, path, value, response);
+        return validator.validate(specification, value, path, strict);
     }catch(error){
         if(error instanceof ValidationError){
             throw error;
         }else{
             throw new ValidationError(
-                specification, path, value, response,
+                specification, value, path, strict,
                 validator, error && error.message
             );
         }
