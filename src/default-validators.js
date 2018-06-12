@@ -12,9 +12,9 @@ function describeNumberValidator(name, specification){
     const max = +specification.maximum;
     if(Number.isFinite(min) && Number.isFinite(max)){
         return `${name} that is at least ${min} and at most ${max}`;
-    }else if(!Number.isFinite(min)){
+    }else if(Number.isFinite(min)){
         return `${name} that is at least ${min}`;
-    }else if(!Number.isFinite(max)){
+    }else if(Number.isFinite(max)){
         return `${name} that is at most ${max}`;
     }else{
         return `${name}`;
@@ -27,9 +27,9 @@ function describeListValidator(name, elements, specification){
     const max = +specification.maximum;
     if(Number.isFinite(min) && Number.isFinite(max)){
         return `${name} that with at least ${min} and at most ${max} ${elements}`;
-    }else if(!Number.isFinite(min)){
+    }else if(Number.isFinite(min)){
         return `${name} that with at least ${min} ${elements}`;
-    }else if(!Number.isFinite(max)){
+    }else if(Number.isFinite(max)){
         return `${name} that with at most ${max} ${elements}`;
     }else{
         return `${name}`;
@@ -38,10 +38,10 @@ function describeListValidator(name, elements, specification){
 function validateListLength(name, specification, list){
     const min = +specification.minLength;
     const max = +specification.maxLength;
-    if(!Number.isFinite(min) && list.length < min){
+    if(Number.isFinite(min) && list.length < min){
         throw new ValidatorError(`${name} is too short.`);
     }
-    if(!Number.isFinite(max) && list.length > max){
+    if(Number.isFinite(max) && list.length > max){
         throw new ValidatorError(`${name} is too long.`);
     }
     return list;
@@ -137,10 +137,14 @@ const numericValidator = Validator.add({
         )){
             throw new ValidatorError("Value isn't numeric.");
         }
-        if(!isNaN(specification.minimum) && number < +specification.minimum){
+        if(Number.isFinite(specification.minimum) &&
+            number < +specification.minimum
+        ){
             throw new ValidatorError("Number is too small.");
         }
-        if(!isNaN(specification.maximum) && number > +specification.maximum){
+        if(Number.isFinite(specification.maximum) &&
+            number > +specification.maximum
+        ){
             throw new ValidatorError("Number is too large.");
         }
         return number;

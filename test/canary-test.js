@@ -85,6 +85,17 @@ function makeTests(validate){
             throwsErrorWith(() => validate.strict(spec, "1"), "Value isn't numeric");
             throwsErrorWith(() => validate.strict(spec, "NaN"), "Value isn't numeric");
         });
+        this.test("bounds", function(){
+            const minSpec = {"type": "numeric", "minimum": 0};
+            assert.equal(validate.strict(minSpec, 0), 0);
+            assert.equal(validate.strict(minSpec, 100), 100);
+            throwsErrorWith(() => validate.strict(minSpec, -1),
+                "Expected a numeric value that is at least 0: Number is too small."
+            );
+            const maxSpec = {"type": "numeric", "maximum": 0};
+            const bothSpec = {"type": "numeric", "minimum": 0, "maximum": 10};
+            
+        });
     });
     
     return canary;
