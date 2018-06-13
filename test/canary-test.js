@@ -206,6 +206,46 @@ function makeTests(validate){
         });
     });
     
+    canary.group("string validator", function(){
+        const spec = {"type": "string"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, ""), "");
+            assert.equal(validate.value(spec, "test"), "test");
+            assert.equal(validate.value(spec, 123), "123");
+            assert.equal(validate.value(spec, null), "");
+            assert.equal(validate.value(spec, undefined), "");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, ""), "");
+            assert.equal(validate.strict(spec, "test"), "test");
+            throwsErrorWith(() => validate.strict(spec, 123), "Value isn't a string");
+            throwsErrorWith(() => validate.strict(spec, null), "Value isn't a string");
+        });
+        this.test("length", function(){
+            const boundSpec = {"type": "string", "minLength": 5, "maxLength": 6};
+            assert.equal(validate.strict(boundSpec, "right"), "right");
+            throwsErrorWith(() => validate.strict(boundSpec, "puny"),
+                "String is too short"
+            );
+            throwsErrorWith(() => validate.strict(boundSpec, "too long"),
+                "String is too long"
+            );
+        });
+        this.test("pattern", function(){
+            const spec1 = {"type": "string", "pattern": /test/};
+            assert.equal(validate.strict(spec1, "test"), "test");
+            throwsErrorWith(() => validate.strict(spec1, "test no match"),
+                "Expected a string and matching the regular expression /test/: String doesn't match the regular expression."
+            );
+            const spec2 = {"type": "string", "pattern": "test2+"};
+            assert.equal(validate.strict(spec2, "test2"), "test2");
+            assert.equal(validate.strict(spec2, "test2222"), "test2222");
+            throwsErrorWith(() => validate.strict(spec2, "test"),
+                "Expected a string and matching the regular expression /test2+/: String doesn't match the regular expression."
+            );
+        });
+    });
+    
     return canary;
 }
 

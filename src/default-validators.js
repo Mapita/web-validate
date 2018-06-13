@@ -228,8 +228,11 @@ const stringValidator = Validator.add({
     },
     describe: function(specification){
         const base = describeListValidator("a string", "characters", specification);
+        const pattern = (typeof(specification.pattern) === "string" ?
+            `/${specification.pattern}/` : specification.pattern
+        );
         if(specification.pattern) return (base +
-            ` and matching the regular expression /${specification.pattern}/`
+            ` and matching the regular expression ${pattern}`
         );
         else return base;
     },
@@ -237,15 +240,21 @@ const stringValidator = Validator.add({
         if(strict && typeof(value) !== "string"){
             throw new ValidatorError("Value isn't a string.");
         }
-        value = validateListLength("String", specification, String(value));
-        if(specification.pattern &&
-            value.match(specification.pattern)[0].length !== value
-        ){
-            throw new ValidatorError(
-                `String doesn't match the regular expression ` +
-                `/${specification.pattern}/`
-            );
+        value = validateListLength("String", specification, (
+            value === null || value === undefined ? "" : String(value)
+        ));
+        if(specification.pattern){
+            const match = value.match(specification.pattern);
+            if(!match || !match[0] || match[0].length !== value.length){
+                const pattern = (typeof(specification.pattern) === "string" ?
+                    `/${specification.pattern}/` : specification.pattern
+                );
+                throw new ValidatorError(
+                    `String doesn't match the regular expression.`
+                );
+            }
         }
+        return value;
     },
 });
 
