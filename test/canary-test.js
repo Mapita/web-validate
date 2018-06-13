@@ -93,8 +93,116 @@ function makeTests(validate){
                 "Expected a numeric value that is at least 0: Number is too small."
             );
             const maxSpec = {"type": "numeric", "maximum": 0};
-            const bothSpec = {"type": "numeric", "minimum": 0, "maximum": 10};
-            
+            assert.equal(validate.strict(maxSpec, 0), 0);
+            assert.equal(validate.strict(maxSpec, -1), -1);
+            throwsErrorWith(() => validate.strict(maxSpec, 100),
+                "Expected a numeric value that is at most 0: Number is too large."
+            );
+            const bothSpec = {"type": "numeric", "minimum": 0, "maximum": 100};
+            assert.equal(validate.strict(bothSpec, 0), 0);
+            assert.equal(validate.strict(bothSpec, 50), 50);
+            assert.equal(validate.strict(bothSpec, 100), 100);
+            throwsErrorWith(() => validate.strict(bothSpec, -2),
+                "Expected a numeric value that is at least 0 and at most 100: Number is too small."
+            );
+            throwsErrorWith(() => validate.strict(bothSpec, 200),
+                "Expected a numeric value that is at least 0 and at most 100: Number is too large."
+            );
+        });
+    });
+    
+    canary.group("number validator", function(){
+        const spec = {"type": "number"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, 0), 0);
+            assert.equal(validate.value(spec, 1.5), 1.5);
+            assert.equal(validate.value(spec, "-20"), -20);
+            throwsErrorWith(() => validate.value(spec, Infinity), "Value isn't a finite number");
+            throwsErrorWith(() => validate.value(spec, NaN), "Value isn't a finite number");
+            throwsErrorWith(() => validate.value(spec, []), "Value isn't numeric");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, 0), 0);
+            assert.equal(validate.strict(spec, 1.5), 1.5);
+            throwsErrorWith(() => validate.strict(spec, "1"), "Value isn't numeric");
+            throwsErrorWith(() => validate.strict(spec, "NaN"), "Value isn't numeric");
+        });
+        this.test("bounds", function(){
+            const boundSpec = {"type": "number", "minimum": 0, "maximum": 100};
+            assert.equal(validate.strict(boundSpec, 0), 0);
+            assert.equal(validate.strict(boundSpec, 50), 50);
+            assert.equal(validate.strict(boundSpec, 100), 100);
+            throwsErrorWith(() => validate.strict(boundSpec, -2),
+                "Expected a finite number that is at least 0 and at most 100: Number is too small."
+            );
+            throwsErrorWith(() => validate.strict(boundSpec, 200),
+                "Expected a finite number that is at least 0 and at most 100: Number is too large."
+            );
+        });
+    });
+    
+    canary.group("integer validator", function(){
+        const spec = {"type": "integer"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, 0), 0);
+            assert.equal(validate.value(spec, 10), 10);
+            assert.equal(validate.value(spec, "-20"), -20);
+            throwsErrorWith(() => validate.value(spec, Infinity), "Value isn't a finite number");
+            throwsErrorWith(() => validate.value(spec, NaN), "Value isn't a finite number");
+            throwsErrorWith(() => validate.value(spec, 1.5), "Value isn't an integer");
+            throwsErrorWith(() => validate.value(spec, []), "Value isn't numeric");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, 0), 0);
+            assert.equal(validate.strict(spec, 10), 10);
+            throwsErrorWith(() => validate.strict(spec, 1.5), "Value isn't an integer");
+            throwsErrorWith(() => validate.strict(spec, "1"), "Value isn't numeric");
+            throwsErrorWith(() => validate.strict(spec, "NaN"), "Value isn't numeric");
+        });
+        this.test("bounds", function(){
+            const boundSpec = {"type": "integer", "minimum": 0, "maximum": 100};
+            assert.equal(validate.strict(boundSpec, 0), 0);
+            assert.equal(validate.strict(boundSpec, 50), 50);
+            assert.equal(validate.strict(boundSpec, 100), 100);
+            throwsErrorWith(() => validate.strict(boundSpec, -2),
+                "Expected an integer that is at least 0 and at most 100: Number is too small."
+            );
+            throwsErrorWith(() => validate.strict(boundSpec, 200),
+                "Expected an integer that is at least 0 and at most 100: Number is too large."
+            );
+        });
+    });
+    
+    canary.group("index validator", function(){
+        const spec = {"type": "index"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, 0), 0);
+            assert.equal(validate.value(spec, 10), 10);
+            assert.equal(validate.value(spec, "20"), 20);
+            throwsErrorWith(() => validate.value(spec, Infinity), "Value isn't a finite number");
+            throwsErrorWith(() => validate.value(spec, NaN), "Value isn't a finite number");
+            throwsErrorWith(() => validate.value(spec, 1.5), "Value isn't an integer");
+            throwsErrorWith(() => validate.value(spec, -1), "Value is less than zero");
+            throwsErrorWith(() => validate.value(spec, []), "Value isn't numeric");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, 0), 0);
+            assert.equal(validate.strict(spec, 10), 10);
+            throwsErrorWith(() => validate.strict(spec, 1.5), "Value isn't an integer");
+            throwsErrorWith(() => validate.strict(spec, "1"), "Value isn't numeric");
+            throwsErrorWith(() => validate.strict(spec, "NaN"), "Value isn't numeric");
+        });
+        this.test("bounds", function(){
+            const boundSpec = {"type": "index", "minimum": 0, "maximum": 100};
+            assert.equal(validate.strict(boundSpec, 0), 0);
+            assert.equal(validate.strict(boundSpec, 50), 50);
+            assert.equal(validate.strict(boundSpec, 100), 100);
+            throwsErrorWith(() => validate.strict(boundSpec, -2),
+                "Expected a non-negative integer index that is at least 0 and at most 100: Number is too small."
+            );
+            throwsErrorWith(() => validate.strict(boundSpec, 200),
+                "Expected a non-negative integer index that is at least 0 and at most 100: Number is too large."
+            );
         });
     });
     

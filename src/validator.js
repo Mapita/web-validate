@@ -3,12 +3,13 @@
 // to provide to an end user in case of a validation error.
 class Validator{
     static add(...validators){
-        let validator;
+        let first;
         for(let validator of validators){
-            const next = this.addOne(validator);
-            validator = validator || next;
+            const next = Validator.addOne(validator);
+            console.log(next);
+            first = first || next;
         }
-        return validator;
+        return first;
     }
     static addOne(validator){
         validator = (validator instanceof Validator ?
