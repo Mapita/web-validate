@@ -56,7 +56,7 @@ function tryGetDate(date){
     }
 }
 function getDate(date){
-    let result;
+    let result = undefined;
     if(date === null || date === undefined){
         return date;
     }else if(date instanceof Date){
@@ -78,10 +78,10 @@ function getDate(date){
     if(!(result instanceof Date)){
         throw new ValidatorError("Value does not represent a date.");
     }
-    if(!Number.isFinite(date.getTime())){
-        throw new ValidatorError("Value is an invalid date.");
+    if(!Number.isFinite(result.getTime())){
+        throw new ValidatorError("Timestamp isn't a finite number.");
     }
-    return undefined;
+    return result;
 }
 
 // Value can be absolutely anything
