@@ -246,6 +246,20 @@ function makeTests(validate){
         });
     });
     
+    canary.group("email address validator", function(){
+        const spec = {"type": "email"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, "test@test.com"), "test@test.com");
+            assert.equal(validate.value(spec, "TEST@Test.com"), "test@test.com");
+            throwsErrorWith(() => validate.value(spec, null), "Value isn't a string");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, "test@test.com"), "test@test.com");
+            assert.equal(validate.strict(spec, "TEST@Test.com"), "test@test.com");
+            throwsErrorWith(() => validate.strict(spec, null), "Value isn't a string");
+        });
+    });
+    
     return canary;
 }
 

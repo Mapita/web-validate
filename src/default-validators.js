@@ -263,12 +263,12 @@ const stringValidator = Validator.add({
 // email address
 // Response: value is required to be a string that resembles an email address
 const emailAddressValidator = Validator.add({
-    name: "emailAddress",
+    name: "email",
     describe: function(specification){
         return "an email address";
     },
     validate: function(specification, value, path, strict){
-        if(strict && typeof(value) !== "string"){
+        if(typeof(value) !== "string"){
             throw new ValidatorError("Value isn't a string.");
         }
         const email = String(value).toLowerCase();
