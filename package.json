@@ -18,7 +18,10 @@
   "homepage": "https://github.com/Mapita/web-validate",
   "license": "MIT",
   "devDependencies": {
-    "canary-test": "~1.0.2"
+    "canary-test": "~1.0.2",
+    "dayjs": "^1.6.9",
+    "luxon": "^1.2.1",
+    "moment": "^2.22.2"
   },
   "main": "src/index.js",
   "files": [
