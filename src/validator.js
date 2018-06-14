@@ -6,7 +6,6 @@ class Validator{
         let first;
         for(let validator of validators){
             const next = Validator.addOne(validator);
-            console.log(next);
             first = first || next;
         }
         return first;
