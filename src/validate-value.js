@@ -19,15 +19,15 @@ function validateValue(specification, value, path, strict){
     try{
         return validator.validate(specification, value, path, strict);
     }catch(error){
-        if(error instanceof ValidationError || !(
-            error instanceof ValidatorError
-        )){
-            throw error;
-        }else{
-            throw new ValidationError(
+        if(error instanceof ValidatorError){
+            const throwError = new ValidationError(
                 specification, value, path, strict,
                 validator, error && error.message
             );
+            Error.captureStackTrace(throwError, arguments.callee);
+            throw throwError;
+        }else{
+            throw error;
         }
     }
 }
