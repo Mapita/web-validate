@@ -318,9 +318,9 @@ const timestampValidator = Validator.add({
         const minDate = tryGetDate(specification.minimum);
         const maxDate = tryGetDate(specification.maximum);
         if(minDate && date < minDate.getTime()){
-            throw new ValidatorError("Date is too early.");
+            throw new ValidatorError("Date is before the low bound.");
         }else if(maxDate && date > maxDate.getTime()){
-            throw new ValidatorError("Date is too late.");
+            throw new ValidatorError("Date is after the high bound.");
         }
         return date;
     },
@@ -329,38 +329,45 @@ const timestampValidator = Validator.add({
 const enumValidator = Validator.add({
     name: "enum",
     parameters: {
-        "options": "Describes a list of acceptable values.",
+        "values": "Describes a list of acceptable values.",
     },
     describe: function(specification){
-        if(specification.options.length === 0){
+        if(!specification || !specification.values ||
+            specification.values.length === 0
+        ){
             return "nothing";
-        }else if(specification.options.length === 1){
-            return `the value ${inspect(specification.options[0])}`;
-        }else{
-            const optionList = specification.options.slice(0,
-                specification.options.length - 2
+        }else if(specification.values.length === 1){
+            return `the value ${inspect(specification.values[0])}`;
+        }else if(specification.values.length === 2){
+            return (
+                `either ${inspect(specification.values[0])} ` +
+                `or ${inspect(specification.values[1])}`
             );
-            const lastOption = specification.options[
-                specification.options.length - 1
+        }else{
+            const valueList = specification.values.slice(0,
+                specification.values.length - 1
+            );
+            const lastOption = specification.values[
+                specification.values.length - 1
             ];
             return (
-                `either ${optionList.map(inspect).join(", ")} ` +
+                `either ${valueList.map(inspect).join(", ")}, ` +
                 `or ${inspect(lastOption)}`
             );
         }
     },
     validate: function(specification, value, path, strict){
-        if(!Array.isArray(specification.options) || !specification.options.length){
+        if(!Array.isArray(specification.values) || !specification.values.length){
             throw new ValidatorError("Enumeration accepts no values.");
         }
-        for(let option of specification.options){
+        for(let option of specification.values){
             if(value === option || (value !== value && option !== option) || (
-                !strict && String(value) === option || +value === option
+                !strict && (String(value) === option || +value === option)
             )){
                 return option;
             }
         }
-        throw new ValidatorError("Value is not one of the acceptable values.");
+        throw new ValidatorError("Value isn't in the enumeration.");
     },
 });
 

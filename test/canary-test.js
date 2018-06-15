@@ -1,22 +1,31 @@
 const assert = require("assert").strict;
 
+const dayjs = require("dayjs");
+const luxon = require("luxon");
+const moment = require("moment");
+
 function throwsErrorWith(callback, string){
     try{
-        callback();
-    }catch(error){
-        if(error.message && error.message.indexOf(string) >= 0){
-            return error;
-        }else if(error.message){
-            assert.fail(
-                `Error message "${error.message}" ` +
-                `doesn't contain the string "${string}". ` +
-                `Stack trace:\n${error.stack}`
-            );
-        }else{
-            assert.fail("Caught error object has no message.");
+        try{
+            callback();
+        }catch(error){
+            if(error.message && error.message.indexOf(string) >= 0){
+                return error;
+            }else if(error.message){
+                assert.fail(
+                    `Error message "${error.message}" ` +
+                    `doesn't contain the string "${string}". ` +
+                    `Stack trace:\n${error.stack}`
+                );
+            }else{
+                assert.fail("Caught error object has no message.");
+            }
         }
+        assert.fail("No error thrown.");
+    }catch(error){
+        Error.captureStackTrace(error, arguments.callee);
+        throw error;
     }
-    assert.fail("No error thrown.");
 }
 
 function assertIsNaN(value){
@@ -257,6 +266,147 @@ function makeTests(validate){
             assert.equal(validate.strict(spec, "test@test.com"), "test@test.com");
             assert.equal(validate.strict(spec, "TEST@Test.com"), "test@test.com");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't a string");
+        });
+    });
+    
+    canary.group("timestamp validator", function(){
+        const spec = {"type": "timestamp"};
+        this.test("normal", function(){
+            assert.deepEqual(validate.value(spec, "2018-01-01T00:00:00Z"),
+                new Date("2018-01-01T00:00:00Z")
+            );
+            assert.deepEqual(validate.value(spec, 123456789000),
+                new Date(123456789000)
+            );
+            throwsErrorWith(() => validate.value(spec, NaN),
+                "Value isn't a valid date"
+            );
+        });
+        this.test("strict", function(){
+            assert.deepEqual(validate.strict(spec, "2018-01-01T00:00:00Z"),
+                new Date("2018-01-01T00:00:00Z")
+            );
+            assert.deepEqual(validate.strict(spec, 123456789000),
+                new Date(123456789000)
+            );
+            throwsErrorWith(() => validate.strict(spec, NaN),
+                "Value isn't a valid date"
+            );
+        });
+        this.test("bounds", function(){
+            const minSpec = {"type": "timestamp", "minimum": "2010-01-01"};
+            assert.deepEqual(validate.strict(minSpec, "2018-01-01T00:00:00Z"),
+                new Date("2018-01-01T00:00:00Z")
+            );
+            throwsErrorWith(() => validate.strict(minSpec, "2000-01-01T00:00:00Z"),
+                "Date is before the low bound"
+            );
+            const maxSpec = {"type": "timestamp", "maximum": "2020-01-01"};
+            assert.deepEqual(validate.strict(maxSpec, "2018-01-01T00:00:00Z"),
+                new Date("2018-01-01T00:00:00Z")
+            );
+            throwsErrorWith(() => validate.strict(maxSpec, "2040-01-01T00:00:00Z"),
+                "Date is after the high bound"
+            );
+            const bothSpec = {"type": "timestamp",
+                "minimum": "2010-01-01", "maximum": "2020-01-01"
+            };
+            assert.deepEqual(validate.strict(bothSpec, "2018-01-01T00:00:00Z"),
+                new Date("2018-01-01T00:00:00Z")
+            );
+            throwsErrorWith(() => validate.strict(bothSpec, "2000-01-01T00:00:00Z"),
+                "Date is before the low bound"
+            );
+            throwsErrorWith(() => validate.strict(bothSpec, "2040-01-01T00:00:00Z"),
+                "Date is after the high bound"
+            );
+        });
+        this.test("dayjs date input", function(){
+            const dayjs = require("dayjs");
+            const date = dayjs("2018-01-01T00:00:00Z");
+            assert.deepEqual(validate.strict(spec, date),
+                new Date("2018-01-01T00:00:00Z")
+            );
+        });
+        this.test("luxon date input", function(){
+            const luxon = require("luxon");
+            const date = luxon.DateTime.utc(2018, 1, 1, 0, 0, 0);
+            assert.deepEqual(validate.strict(spec, date),
+                new Date("2018-01-01T00:00:00Z")
+            );
+        });
+        this.test("moment date input", function(){
+            const moment = require("moment");
+            const date = moment.utc("2018-01-01T00:00:00Z");
+            assert.deepEqual(validate.strict(spec, date),
+                new Date("2018-01-01T00:00:00Z")
+            );
+        });
+    });
+    
+    canary.group("enumeration validator", function(){
+        const spec = {"type": "enum", "values": [1, 2, "three"]};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, 1), 1);
+            assert.equal(validate.value(spec, 2), 2);
+            assert.equal(validate.value(spec, "2"), 2);
+            assert.equal(validate.value(spec, "three"), "three");
+            throwsErrorWith(() => validate.value(spec, "not valid"),
+                "Expected either 1, 2, or 'three': Value isn't in the enumeration."
+            );
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, 1), 1);
+            assert.equal(validate.strict(spec, 2), 2);
+            assert.equal(validate.strict(spec, "three"), "three");
+            throwsErrorWith(() => validate.strict(spec, "2"),
+                "Expected either 1, 2, or 'three': Value isn't in the enumeration."
+            );
+            throwsErrorWith(() => validate.strict(spec, "not valid"),
+                "Expected either 1, 2, or 'three': Value isn't in the enumeration."
+            );
+        });
+        this.test("no options", function(){
+            throwsErrorWith(() => validate.strict({"type": "enum"}, 0),
+                "Expected nothing: Enumeration accepts no values."
+            );
+            throwsErrorWith(() => validate.strict({"type": "enum", "values": []}, 0),
+                "Expected nothing: Enumeration accepts no values."
+            );
+        });
+        this.test("one option", function(){
+            const oneSpec = {"type": "enum", "values": ["test"]};
+            assert.equal(validate.strict(oneSpec, "test"), "test");
+            throwsErrorWith(() => validate.strict(oneSpec, 0),
+                "Expected the value 'test': Value isn't in the enumeration."
+            );
+        });
+        this.test("two options", function(){
+            const twoSpec = {"type": "enum", "values": ["a", "b"]};
+            assert.equal(validate.strict(twoSpec, "a"), "a");
+            assert.equal(validate.strict(twoSpec, "b"), "b");
+            throwsErrorWith(() => validate.strict(twoSpec, "c"),
+                "Expected either 'a' or 'b': Value isn't in the enumeration."
+            );
+        });
+        this.test("three options", function(){
+            const threeSpec = {"type": "enum", "values": ["a", "b", "c"]};
+            assert.equal(validate.strict(threeSpec, "a"), "a");
+            assert.equal(validate.strict(threeSpec, "b"), "b");
+            assert.equal(validate.strict(threeSpec, "c"), "c");
+            throwsErrorWith(() => validate.strict(threeSpec, "d"),
+                "Expected either 'a', 'b', or 'c': Value isn't in the enumeration."
+            );
+        });
+        this.test("four options", function(){
+            const threeSpec = {"type": "enum", "values": ["a", "b", "c", "d"]};
+            assert.equal(validate.strict(threeSpec, "a"), "a");
+            assert.equal(validate.strict(threeSpec, "b"), "b");
+            assert.equal(validate.strict(threeSpec, "c"), "c");
+            assert.equal(validate.strict(threeSpec, "d"), "d");
+            throwsErrorWith(() => validate.strict(threeSpec, "e"),
+                "Expected either 'a', 'b', 'c', or 'd': Value isn't in the enumeration."
+            );
         });
     });
     
