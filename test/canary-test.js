@@ -410,6 +410,50 @@ function makeTests(validate){
         });
     });
     
+    canary.group("list validator", function(){
+        const spec = {"type": "list"};
+        this.test("normal", function(){
+            assert.deepEqual(validate.value(spec, []), []);
+            assert.deepEqual(validate.value(spec, [1, 2, 3]), [1, 2, 3]);
+            throwsErrorWith(() => validate.value(spec, "hi"), "Value isn't a list");
+            throwsErrorWith(() => validate.value(spec, null), "Value isn't a list");
+            throwsErrorWith(() => validate.value(spec, 12345), "Value isn't a list");
+        });
+        this.test("strict", function(){
+            assert.deepEqual(validate.strict(spec, []), []);
+            assert.deepEqual(validate.strict(spec, [1, 2, 3]), [1, 2, 3]);
+            throwsErrorWith(() => validate.strict(spec, "hi"), "Value isn't a list");
+            throwsErrorWith(() => validate.strict(spec, null), "Value isn't a list");
+            throwsErrorWith(() => validate.strict(spec, 12345), "Value isn't a list");
+        });
+        const eachSpec = {"type": "list", "each": {"type": "number"}};
+        this.test("each normal", function(){
+            assert.deepEqual(validate.value(eachSpec, []), []);
+            assert.deepEqual(validate.value(eachSpec, [1, 2, 3]), [1, 2, 3]);
+            assert.deepEqual(validate.value(eachSpec, ["4", 5, "6"]), [4, 5, 6]);
+            throwsErrorWith(() => validate.value(eachSpec, [1, 2, "nope"]),
+                "Expected a finite number at [2]: Value isn't numeric."
+            );
+        });
+        this.test("each strict", function(){
+           assert.deepEqual(validate.strict(eachSpec, []), []);
+           assert.deepEqual(validate.strict(eachSpec, [1, 2, 3]), [1, 2, 3]);
+           throwsErrorWith(() => validate.strict(eachSpec, [1, "2", 3]),
+               "Expected a finite number at [1]: Value isn't numeric."
+           ); 
+        });
+        this.test("length", function(){
+            const boundSpec = {"type": "list", "minLength": 2, "maxLength": 4};
+            assert.deepEqual(validate.strict(boundSpec, [1, 2]), [1, 2]);
+            throwsErrorWith(() => validate.strict(boundSpec, []),
+                "List is too short"
+            );
+            throwsErrorWith(() => validate.strict(boundSpec, [1, 2, 3, 4, 5]),
+                "List is too long"
+            );
+        });
+    });
+    
     return canary;
 }
 
