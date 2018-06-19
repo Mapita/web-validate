@@ -16,7 +16,7 @@ ValidationPath.prototype.toString = function(){
     )){
         return this.parent ? this.parent.toString() : "";
     }else if(typeof(this.attribute) === "number"){
-        return (this.parent || "") + "[" + attribute + "]";
+        return (this.parent || "") + "[" + this.attribute + "]";
     }
     let looksLikeIdentifier = true;
     const attribute = String(this.attribute);

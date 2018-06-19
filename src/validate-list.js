@@ -21,11 +21,9 @@ function validateList(specification, list, path, strict){
     // Validate each element in the list
     for(let element of list){
         if(specification.each){
+            const nextPath = path.getNextPath(validatedArray.length);
             validatedArray.push(validateValue(
-                specification.each,
-                path.getNextPath(validatedArray.length),
-                element,
-                strict,
+                specification.each, element, nextPath, strict
             ));
         }else{
             validatedArray.push(element);

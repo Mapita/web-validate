@@ -28,11 +28,9 @@ function validateObject(specification, object, path, strict){
     // Validate present attributes
     for(let key in value){
         if(specification.attributes[key]){
+            const nextPath = path.getNextPath(key);
             validatedObject[key] = validateValue(
-                specification,
-                path.getNextPath(key),
-                object[key],
-                strict
+                specification, object[key], nextPath, strict
             );
         }else if(strict){
             throw new ValidatorError(`Extra attribute "${key}".`);
