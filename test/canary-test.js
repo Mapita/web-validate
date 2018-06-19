@@ -352,7 +352,7 @@ function makeTests(validate){
             assert.equal(validate.value(spec, "2"), 2);
             assert.equal(validate.value(spec, "three"), "three");
             throwsErrorWith(() => validate.value(spec, "not valid"),
-                "Expected either 1, 2, or 'three': Value isn't in the enumeration."
+                `Expected either 1, 2, or "three": Value isn't in the enumeration.`
             );
         });
         this.test("strict", function(){
@@ -360,10 +360,10 @@ function makeTests(validate){
             assert.equal(validate.strict(spec, 2), 2);
             assert.equal(validate.strict(spec, "three"), "three");
             throwsErrorWith(() => validate.strict(spec, "2"),
-                "Expected either 1, 2, or 'three': Value isn't in the enumeration."
+                `Expected either 1, 2, or "three": Value isn't in the enumeration.`
             );
             throwsErrorWith(() => validate.strict(spec, "not valid"),
-                "Expected either 1, 2, or 'three': Value isn't in the enumeration."
+                `Expected either 1, 2, or "three": Value isn't in the enumeration.`
             );
         });
         this.test("no options", function(){
@@ -378,7 +378,7 @@ function makeTests(validate){
             const oneSpec = {"type": "enum", "values": ["test"]};
             assert.equal(validate.strict(oneSpec, "test"), "test");
             throwsErrorWith(() => validate.strict(oneSpec, 0),
-                "Expected the value 'test': Value isn't in the enumeration."
+                `Expected the value "test": Value isn't in the enumeration.`
             );
         });
         this.test("two options", function(){
@@ -386,7 +386,7 @@ function makeTests(validate){
             assert.equal(validate.strict(twoSpec, "a"), "a");
             assert.equal(validate.strict(twoSpec, "b"), "b");
             throwsErrorWith(() => validate.strict(twoSpec, "c"),
-                "Expected either 'a' or 'b': Value isn't in the enumeration."
+                `Expected either "a" or "b": Value isn't in the enumeration.`
             );
         });
         this.test("three options", function(){
@@ -395,7 +395,7 @@ function makeTests(validate){
             assert.equal(validate.strict(threeSpec, "b"), "b");
             assert.equal(validate.strict(threeSpec, "c"), "c");
             throwsErrorWith(() => validate.strict(threeSpec, "d"),
-                "Expected either 'a', 'b', or 'c': Value isn't in the enumeration."
+                `Expected either "a", "b", or "c": Value isn't in the enumeration.`
             );
         });
         this.test("four options", function(){
@@ -405,7 +405,7 @@ function makeTests(validate){
             assert.equal(validate.strict(threeSpec, "c"), "c");
             assert.equal(validate.strict(threeSpec, "d"), "d");
             throwsErrorWith(() => validate.strict(threeSpec, "e"),
-                "Expected either 'a', 'b', 'c', or 'd': Value isn't in the enumeration."
+                `Expected either "a", "b", "c", or "d": Value isn't in the enumeration.`
             );
         });
     });
@@ -415,16 +415,18 @@ function makeTests(validate){
         this.test("normal", function(){
             assert.deepEqual(validate.value(spec, []), []);
             assert.deepEqual(validate.value(spec, [1, 2, 3]), [1, 2, 3]);
-            throwsErrorWith(() => validate.value(spec, "hi"), "Value isn't a list");
             throwsErrorWith(() => validate.value(spec, null), "Value isn't a list");
             throwsErrorWith(() => validate.value(spec, 12345), "Value isn't a list");
+            throwsErrorWith(() => validate.value(spec, "hi"), "Value isn't a list");
+            throwsErrorWith(() => validate.value(spec, {}), "Value isn't a list");
         });
         this.test("strict", function(){
             assert.deepEqual(validate.strict(spec, []), []);
             assert.deepEqual(validate.strict(spec, [1, 2, 3]), [1, 2, 3]);
-            throwsErrorWith(() => validate.strict(spec, "hi"), "Value isn't a list");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't a list");
             throwsErrorWith(() => validate.strict(spec, 12345), "Value isn't a list");
+            throwsErrorWith(() => validate.strict(spec, "hi"), "Value isn't a list");
+            throwsErrorWith(() => validate.strict(spec, {}), "Value isn't a list");
         });
         const eachSpec = {"type": "list", "each": {"type": "number"}};
         this.test("each normal", function(){
@@ -450,6 +452,47 @@ function makeTests(validate){
             );
             throwsErrorWith(() => validate.strict(boundSpec, [1, 2, 3, 4, 5]),
                 "List is too long"
+            );
+        });
+    });
+    
+    canary.group("object validator", function(){
+        const spec = {"type": "object"};
+        this.test("normal", function(){
+            assert.deepEqual(validate.value(spec, {}), {});
+            assert.deepEqual(validate.value(spec, {"a": "b", "c": "d"}), {"a": "b", "c": "d"});
+            throwsErrorWith(() => validate.value(spec, null), "Value isn't an object");
+            throwsErrorWith(() => validate.value(spec, 12345), "Value isn't an object");
+            throwsErrorWith(() => validate.value(spec, "hi"), "Value isn't an object");
+        });
+        this.test("strict", function(){
+            assert.deepEqual(validate.strict(spec, {}), {});
+            assert.deepEqual(validate.strict(spec, {"a": "b", "c": "d"}), {"a": "b", "c": "d"});
+            throwsErrorWith(() => validate.strict(spec, null), "Value isn't an object");
+            throwsErrorWith(() => validate.strict(spec, 12345), "Value isn't an object");
+            throwsErrorWith(() => validate.strict(spec, "hi"), "Value isn't an object");
+        });
+        const attrSpec = {"type": "object", "attributes": {
+            "boolean": {"type": "boolean"},
+            "number": {"type": "number"},
+        }};
+        const obj1 = {"boolean": false, "number": 1};
+        const obj2 = {"boolean": "false", "number": 1};
+        const obj3 = {"boolean": false, "number": "nope"};
+        this.test("attributes normal", function(){
+            assert.deepEqual(validate.value(attrSpec, obj1), obj1);
+            assert.deepEqual(validate.value(attrSpec, obj2), obj1);
+            throwsErrorWith(() => validate.value(attrSpec, obj3),
+                `Expected a finite number at ["number"]: Value isn't numeric.`
+            );
+        });
+        this.test("attributes strict", function(){
+            assert.deepEqual(validate.strict(attrSpec, obj1), obj1);
+            throwsErrorWith(() => validate.strict(attrSpec, obj2),
+                `Expected a boolean at ["boolean"]: Value isn't a boolean.`
+            );
+            throwsErrorWith(() => validate.strict(attrSpec, obj3),
+                `Expected a finite number at ["number"]: Value isn't numeric.`
             );
         });
     });
