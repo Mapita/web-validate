@@ -1,4 +1,5 @@
 const validateValue = require("./validate-value");
+const ValidatorError = require("./validator-error");
 
 // Helper to validate a list of values
 function validateList(specification, list, path, strict){
@@ -7,7 +8,7 @@ function validateList(specification, list, path, strict){
     if(!list || !list[Symbol.iterator] ||
         !(list[Symbol.iterator] instanceof Function)
     ){
-        throw new Error("Value isn't a list.");
+        throw new ValidatorError("Value isn't a list.");
     }
     // This is the validated array that will be returned
     const validatedArray = [];
@@ -19,7 +20,7 @@ function validateList(specification, list, path, strict){
     // Validate each element in the list
     for(let element of list){
         if(validatedArray.length >= maxLength){
-            throw new Error("List is too long.");
+            throw new ValidatorError("List is too long.");
         }
         if(specification.each){
             validatedArray.push(validateValue(
@@ -36,7 +37,7 @@ function validateList(specification, list, path, strict){
     if(Number.isFinite(+specification.minimum) &&
         validatedArray.length < +specification.minimum
     ){
-        throw new Error("List is too short.");
+        throw new ValidatorError("List is too short.");
     }
     // All done, return the result
     return validatedArray;

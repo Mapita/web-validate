@@ -1,11 +1,12 @@
 const validateValue = require("./validate-value");
+const ValidatorError = require("./validator-error");
 
 // Helper to validate an object
 function validateObject(specification, object, path, strict){
     path = path || new ValidationPath();
     // Check that the input is really some kind of object
     if(typeof(object) !== "object"){
-        throw new Error("Value isn't an object.");
+        throw new ValidatorError("Value isn't an object.");
     }
     // If there's no validators for attributes, then just return now
     if(!specification.attributes){
@@ -18,7 +19,7 @@ function validateObject(specification, object, path, strict){
         const attrSpec = specification.attributes[key];
         if(!(key in object)){
             if(!attrSpec.optional){
-                throw new Error(`Missing required attribute "${key}".`);
+                throw new ValidatorError(`Missing required attribute "${key}".`);
             }else if("default" in attrSpec){
                 validatedObject[key] = attrSpec.default;
             }
@@ -34,7 +35,7 @@ function validateObject(specification, object, path, strict){
                 strict
             );
         }else if(strict){
-            throw new Error(`Extra attribute "${key}".`);
+            throw new ValidatorError(`Extra attribute "${key}".`);
         }
     }
     // All done, return the output object
