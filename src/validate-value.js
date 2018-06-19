@@ -5,6 +5,9 @@ const ValidationPath = require("./validation-path");
 
 // Validate a single value of any type
 function validateValue(specification, value, path, strict){
+    if(!specification || typeof(specification) !== "object"){
+        throw new Error("Validation requires a specification object.");
+    }
     path = path || new ValidationPath();
     const validator = specification.validator || (
         Validator.byName[specification.type]
