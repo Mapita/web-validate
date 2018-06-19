@@ -6,6 +6,8 @@ const ValidatorError = require("./validator-error");
 const validateList = require("./validate-list");
 const validateObject = require("./validate-object");
 
+const englishList = require("./english-list");
+
 // Helper for number validators
 function describeNumberValidator(name, specification){
     const min = +specification.minimum;
@@ -45,6 +47,67 @@ function validateListLength(name, specification, list){
         throw new ValidatorError(`${name} is too long.`);
     }
     return list;
+}
+
+// Helper for object validator
+function describeObjectValidator(specification){
+    if(!specification || !specification.attributes){
+        return "an object";
+    }
+    const requiredKeys = [];
+    const optionalKeys = [];
+    for(let key in specification.attributes){
+        if(specification.attributes[key].optional){
+            optionalKeys.push(key);
+        }else{
+            requiredKeys.push(key);
+        }
+    }
+    const totalKeys = (
+        requiredKeys.length + optionalKeys.length
+    );
+    if(totalKeys === 0){
+        return "an object with no attributes";
+    }else if(optionalKeys.length === 0){
+        if(requiredKeys.length === 1){
+            return `an object with a mandatory key "${requiredKeys[0]}"`
+        }else if(requiredKeys.length <= 10){
+            return "an object with mandatory keys " + englishList(
+                requiredKeys.map(key => `"${key}"`, "and")
+            );
+        }else{
+            return `an object with ${requiredKeys.length} mandatory keys`;
+        }
+    }else if(requiredKeys.length === 0){
+        if(optionalKeys.length === 1){
+            return `an object with an optional key "${requiredKeys[0]}"`
+        }else if(optionalKeys.length <= 10){
+            return "an object with optional keys " + englishList(
+                optionalKeys.map(key => `"${key}"`, "and")
+            );
+        }else{
+            return `an object with ${optionalKeys.length} optional keys`;
+        }
+    }else if(totalKeys <= 10){
+        const required = (requiredKeys.length === 1 ?
+            "a mandatory key" : "mandatory keys"
+        );
+        const optional = (optionalKeys.length === 1 ?
+            "an optional key" : "optional keys"
+        );
+        return `an object with ${required} ` + englishList(
+            requiredKeys.map(key => `"${key}"`, "and")
+        ) + ` and ${optional} ` + englishList(
+            optionalKeys.map(key => `"${key}"`, "and")
+        );
+    }else{
+        const keysReq = requiredKeys.length === 1 ? "key" : "keys";
+        const keysOpt = optionalKeys.length === 1 ? "key" : "keys";
+        return (
+            `an object with ${requiredKeys.length} mandatory ${keysReq} ` +
+            `and ${optionalKeys.length} optional ${keysOpt}`
+        );
+    }
 }
 
 // Helpers for date validators
@@ -109,7 +172,13 @@ const booleanValidator = Validator.add({
         if(strict && value !== true && value !== false){
             throw new ValidatorError("Value isn't a boolean.");
         }
-        return !!value;
+        if(!strict && typeof(value) === "string" &&
+            value.toLowerCase() === "false"
+        ){
+            return false;
+        }else{
+            return !!value;
+        }
     },
 });
 
@@ -332,28 +401,17 @@ const enumValidator = Validator.add({
         "values": "Describes a list of acceptable values.",
     },
     describe: function(specification){
-        if(!specification || !specification.values ||
-            specification.values.length === 0
-        ){
+        const values = specification && specification.values;
+        function valueToString(value){
+            return typeof(value) === "string" ? `"${value}"` : inspect(value);
+        }
+        if(!values || !values.length){
             return "nothing";
-        }else if(specification.values.length === 1){
-            return `the value ${inspect(specification.values[0])}`;
-        }else if(specification.values.length === 2){
-            return (
-                `either ${inspect(specification.values[0])} ` +
-                `or ${inspect(specification.values[1])}`
-            );
+        }else if(values.length === 1){
+            return `the value ${valueToString(values[0])}`;
         }else{
-            const valueList = specification.values.slice(0,
-                specification.values.length - 1
-            );
-            const lastOption = specification.values[
-                specification.values.length - 1
-            ];
-            return (
-                `either ${valueList.map(inspect).join(", ")}, ` +
-                `or ${inspect(lastOption)}`
-            );
+            const list = englishList(values.map(valueToString), "or");
+            return "either " + list;
         }
     },
     validate: function(specification, value, path, strict){
@@ -404,7 +462,7 @@ const objectValidator = Validator.add({
         "attributes": "Describes a validator per attribute of the object.",
     },
     describe: function(specification){
-        return describeListValidator("an object");
+        return describeObjectValidator(specification);
     },
     validate: function(specification, value, path, strict){
         return validateObject(specification, value, path, strict);
