@@ -152,6 +152,7 @@ function getDate(date){
 // Response: value is not changed or validated
 const anyValidator = Validator.add({
     name: "any",
+    defaultValue: undefined,
     describe: function(specification){
         return "any value";
     },
@@ -165,6 +166,7 @@ const anyValidator = Validator.add({
 // Response: value is required to be a boolean
 const booleanValidator = Validator.add({
     name: "boolean",
+    defaultValue: false,
     describe: function(specification){
         return "a boolean";
     },
@@ -190,6 +192,7 @@ const booleanValidator = Validator.add({
 // validator does not.
 const numericValidator = Validator.add({
     name: "numeric",
+    defaultValue: 0,
     parameters: {
         "minimum": "The minimum allowed value for the number.",
         "maximum": "The maximum allowed value for the number.",
@@ -229,6 +232,7 @@ const numericValidator = Validator.add({
 // validator does not.
 const numberValidator = Validator.add({
     name: "number",
+    defaultValue: 0,
     describe: function(specification){
         return describeNumberValidator("a finite number", specification);
     },
@@ -249,6 +253,7 @@ const numberValidator = Validator.add({
 // Response: value is required to be an integer in bounds
 const integerValidator = Validator.add({
     name: "integer",
+    defaultValue: 0,
     describe: function(specification){
         return describeNumberValidator("an integer", specification);
     },
@@ -270,6 +275,7 @@ const integerValidator = Validator.add({
 // Response: value is required to be an integer at least zero and in bounds
 const indexValidator = Validator.add({
     name: "index",
+    defaultValue: 0,
     describe: function(specification){
         return describeNumberValidator("a non-negative integer index", specification);
     },
@@ -290,6 +296,7 @@ const indexValidator = Validator.add({
 // Response: value is required to be a string of acceptable length
 const stringValidator = Validator.add({
     name: "string",
+    defaultValue: "",
     parameters: {
         "minimum": "The string must contain at least this many characters.",
         "maximum": "The string must not contain more characters than this.",
@@ -333,6 +340,7 @@ const stringValidator = Validator.add({
 // Response: value is required to be a string that resembles an email address
 const emailAddressValidator = Validator.add({
     name: "email",
+    defaultValue: "",
     describe: function(specification){
         return "an email address";
     },
@@ -357,6 +365,7 @@ const emailAddressValidator = Validator.add({
 // strings, moment date objects, luxon date objects, and dayjs date objects.
 const timestampValidator = Validator.add({
     name: "timestamp",
+    defaultValue: new Date(0),
     parameters: {
         "minimum": "The date must not be any earlier than this Date object.",
         "maximum": "The date must not be any later than this Date object.",
@@ -427,6 +436,12 @@ const enumValidator = Validator.add({
         }
         throw new ValidatorError("Value isn't in the enumeration.");
     },
+    getDefaultValue(specification){
+        return (
+            specification && specification.values &&
+            specification.values[0]
+        );
+    },
 });
 
 // Validator for lists
@@ -439,6 +454,7 @@ const enumValidator = Validator.add({
 const listValidator = Validator.add({
     name: "list",
     defaultPath: "list",
+    getDefaultValue: () => [],
     parameters: {
         "minimum": "The list must contain at least this many elements.",
         "maximum": "The list must not contain more elements than this.",
@@ -460,6 +476,7 @@ const listValidator = Validator.add({
 const objectValidator = Validator.add({
     name: "object",
     defaultPath: "object",
+    getDefaultValue: () => {},
     parameters: {
         "attributes": "Describes a validator per attribute of the object.",
     },

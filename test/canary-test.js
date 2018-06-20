@@ -495,6 +495,31 @@ function makeTests(validate){
                 `Expected a finite number at object.number: Value isn't numeric.`
             );
         });
+        const optSpec = {"type": "object", "attributes": {
+            "implicitDefault": {
+                "type": "number", "optional": true
+            },
+            "explicitDefault": {
+                "type": "number", "optional": true, "default": 100
+            },
+            "nullableDefault": {
+                "type": "number", "optional": true, "nullable": true
+            },
+        }};
+        this.test("optional attributes", function(){
+            const none = {};
+            const all = {
+                "implicitDefault": 10,
+                "explicitDefault": 20,
+                "nullableDefault": 30,
+            };
+            assert.deepEqual(validate.value(optSpec, all), all);
+            assert.deepEqual(validate.value(optSpec, none), {
+                "implicitDefault": 0,
+                "explicitDefault": 100,
+                "nullableDefault": null,
+            });
+        });
     });
     
     return canary;

@@ -21,12 +21,6 @@ require("./default-validators");
 function validateValueStrict(specification, value, path){
     return validateValue(specification, value, path, true);
 }
-function validateListStrict(specification, value, path){
-    return validateListStrict(specification, value, path, true);
-}
-function validateObjectStrict(specification, value, path){
-    return validateObjectStrict(specification, value, path, true);
-}
 function validateAttributesStrict(specification, value, path){
     return validateAttributes(specification, value, path, true);
 }
@@ -34,12 +28,8 @@ function validateAttributesStrict(specification, value, path){
 // Module object to export
 const validateExport = {
     value: validateValue,
-    list: validateList,
-    object: validateObject,
     attributes: validateAttributes,
     strict: validateValueStrict,
-    listStrict: validateListStrict,
-    objectStrict: validateObjectStrict,
     attributesStrict: validateAttributesStrict,
     Error: ValidationError,
     ValidatorError: ValidatorError,

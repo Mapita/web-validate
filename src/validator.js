@@ -25,6 +25,7 @@ class Validator{
     constructor(options){
         this.name = options.name;
         this.defaultPath = options.defaultPath;
+        this.defaultValue = options.defaultValue;
         this.parameters = options.parameters || {};
         this.describe = options.describe || Validator.defaultDescribeFunction;
         this.validate = (options.validate || (
