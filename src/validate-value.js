@@ -14,16 +14,15 @@ function validateValue(specification, value, path, strict){
         path = new ValidationPath(path);
     }else if(!path){
         path = new ValidationPath(null, validator.defaultPath);
-        console.log("INITIAL PATH: ", path);
+    }
+    if(specification.nullable && (
+        value === null || value === undefined
+    )){
+        return value;
     }
     try{
         return validator.validate(specification, value, path, strict);
     }catch(error){
-        if(specification.nullable &&
-            value === null || value === undefined
-        ){
-            return value;
-        }
         if(error instanceof ValidatorError){
             const throwError = new ValidationError(
                 specification, value, path, strict,

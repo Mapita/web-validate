@@ -495,6 +495,20 @@ function makeTests(validate){
                 `Expected a finite number at object.number: Value isn't numeric.`
             );
         });
+        this.test("nullable attributes", function(){
+            const nullSpec = {"type": "object", "attributes": {
+                "test": {"type": "string", "nullable": true},
+            }};
+            assert.deepEqual(validate.strict(nullSpec, {"test": ""}), {"test": ""});
+            assert.deepEqual(validate.strict(nullSpec, {"test": "x"}), {"test": "x"});
+            assert.deepEqual(validate.strict(nullSpec, {"test": null}), {"test": null});
+            const notNullSpec = {"type": "object", "attributes": {
+                "test": {"type": "string"},
+            }};
+            throwsErrorWith(() => validate.strict(notNullSpec, {"test": null}),
+                `Expected a string at object.test: Value isn't a string.`
+            );
+        });
         const optSpec = {"type": "object", "attributes": {
             "implicitDefault": {
                 "type": "number", "optional": true
