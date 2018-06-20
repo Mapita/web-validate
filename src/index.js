@@ -30,7 +30,7 @@ const validateExport = {
     value: validateValue,
     attributes: validateAttributes,
     strict: validateValueStrict,
-    attributesStrict: validateAttributesStrict,
+    strictAttributes: validateAttributesStrict,
     Error: ValidationError,
     ValidatorError: ValidatorError,
     Path: ValidationPath,

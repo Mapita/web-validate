@@ -536,6 +536,82 @@ function makeTests(validate){
         });
     });
     
+    canary.test("deeply nested specification", function(){
+        const spec = {
+            "type": "object",
+            "attributes": {
+                "boolean": {
+                    "type": "boolean",
+                },
+                "list": {
+                    "type": "list",
+                    "each": {
+                        "type": "object",
+                        "attributes": {
+                            "number": {
+                                "type": "number",
+                            },
+                            "object": {
+                                "type": "object"
+                            },
+                        },
+                    },
+                },
+            },
+        };
+        const okObj = {
+            "boolean": true,
+            "list": [
+                {
+                    "number": 1,
+                    "object": {},
+                },
+                {
+                    "number": 2,
+                    "object": {"a": "b"},
+                },
+            ],
+        };
+        const validated = validate.value(spec, okObj);
+        assert.notEqual(validated, okObj);
+        assert.deepEqual(validated, okObj);
+        const failObj = {
+            "boolean": true,
+            "list": [
+                {
+                    "number": 3,
+                    "object": {},
+                },
+                {
+                    "number": "nope",
+                    "object": {"a": "b"},
+                },
+            ],
+        };
+        throwsErrorWith(() => validate.value(spec, failObj),
+            `Expected a finite number at object.list[1].number: Value isn't numeric.`
+        );
+    });
+    
+    canary.group("attributes validation helper", function(){
+        const attrSpec = {
+            "number": {"type": "number"},
+            "string": {"type": "string"},
+        };
+        const obj1 = {"number": 1, "string": "ok"};
+        const obj2 = {"number": "1", "string": "ok"};
+        this.test("normal", function(){
+            assert.deepEqual(validate.attributes(attrSpec, obj1), obj1);
+            assert.deepEqual(validate.attributes(attrSpec, obj2), obj1);
+        });
+        this.test("strict", function(){
+            assert.deepEqual(validate.strictAttributes(attrSpec, obj1), obj1);
+            throwsErrorWith(() => validate.strictAttributes(attrSpec, obj2),
+                `Expected a finite number at object.number: Value isn't numeric.`
+            );
+        });
+    });
+    
     return canary;
 }
 
