@@ -19,12 +19,6 @@ ValidationPath.prototype.toString = function(){
         return this.parent ? this.parent.toString() : "";
     }else if(typeof(this.attribute) === "number"){
         return `${this.parent || ""}[${this.attribute}]`;
-    }else if(!this.parent ||
-        this.parent.attribute === null ||
-        this.parent.attribute === undefined ||
-        this.parent.attribute === ""
-    ){
-        return `["${this.attribute}"]`;
     }
     const attribute = String(this.attribute);
     let looksLikeIdentifier = ValidationPath.alpha.indexOf(attribute[0]) >= 0;
@@ -35,9 +29,11 @@ ValidationPath.prototype.toString = function(){
         }
     }
     if(looksLikeIdentifier){
-        return `${this.parent}.${this.attribute}`;
+        return (this.parent ?
+            `${this.parent}.${this.attribute}` : this.attribute
+        );
     }else{
-        return `${this.parent}["${this.attribute}"]`;
+        return `${this.parent || ""}["${this.attribute}"]`;
     }
 };
 

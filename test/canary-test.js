@@ -434,14 +434,14 @@ function makeTests(validate){
             assert.deepEqual(validate.value(eachSpec, [1, 2, 3]), [1, 2, 3]);
             assert.deepEqual(validate.value(eachSpec, ["4", 5, "6"]), [4, 5, 6]);
             throwsErrorWith(() => validate.value(eachSpec, [1, 2, "nope"]),
-                "Expected a finite number at [2]: Value isn't numeric."
+                "Expected a finite number at list[2]: Value isn't numeric."
             );
         });
         this.test("each strict", function(){
            assert.deepEqual(validate.strict(eachSpec, []), []);
            assert.deepEqual(validate.strict(eachSpec, [1, 2, 3]), [1, 2, 3]);
            throwsErrorWith(() => validate.strict(eachSpec, [1, "2", 3]),
-               "Expected a finite number at [1]: Value isn't numeric."
+               "Expected a finite number at list[1]: Value isn't numeric."
            ); 
         });
         this.test("length", function(){
@@ -483,16 +483,16 @@ function makeTests(validate){
             assert.deepEqual(validate.value(attrSpec, obj1), obj1);
             assert.deepEqual(validate.value(attrSpec, obj2), obj1);
             throwsErrorWith(() => validate.value(attrSpec, obj3),
-                `Expected a finite number at ["number"]: Value isn't numeric.`
+                `Expected a finite number at object.number: Value isn't numeric.`
             );
         });
         this.test("attributes strict", function(){
             assert.deepEqual(validate.strict(attrSpec, obj1), obj1);
             throwsErrorWith(() => validate.strict(attrSpec, obj2),
-                `Expected a boolean at ["boolean"]: Value isn't a boolean.`
+                `Expected a boolean at object.boolean: Value isn't a boolean.`
             );
             throwsErrorWith(() => validate.strict(attrSpec, obj3),
-                `Expected a finite number at ["number"]: Value isn't numeric.`
+                `Expected a finite number at object.number: Value isn't numeric.`
             );
         });
     });

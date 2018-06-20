@@ -438,6 +438,7 @@ const enumValidator = Validator.add({
 // The iterable is converted to an array
 const listValidator = Validator.add({
     name: "list",
+    defaultPath: "list",
     parameters: {
         "minimum": "The list must contain at least this many elements.",
         "maximum": "The list must not contain more elements than this.",
@@ -458,6 +459,7 @@ const listValidator = Validator.add({
 // satisfy the associated validator specifications
 const objectValidator = Validator.add({
     name: "object",
+    defaultPath: "object",
     parameters: {
         "attributes": "Describes a validator per attribute of the object.",
     },

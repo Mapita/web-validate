@@ -8,7 +8,6 @@ function validateValue(specification, value, path, strict){
     if(!specification || typeof(specification) !== "object"){
         throw new Error("Validation requires a specification object.");
     }
-    path = path || new ValidationPath();
     const validator = specification.validator || (
         Validator.byName[specification.type]
     );
@@ -18,6 +17,12 @@ function validateValue(specification, value, path, strict){
         throw new Error("No validator was specified.");
     }else if(!(validator.validate instanceof Function)){
         throw new Error("Invalid validator.");
+    }
+    if(typeof(path) === "string" || typeof(path) === "number"){
+        path = new ValidationPath(path);
+    }else if(!path){
+        path = new ValidationPath(null, validator.defaultPath);
+        console.log("INITIAL PATH: ", path);
     }
     try{
         return validator.validate(specification, value, path, strict);
