@@ -349,25 +349,37 @@ function makeTests(validate){
     });
     
     canary.group("enumeration validator", function(){
-        const spec = {"type": "enum", "values": [1, 2, "three"]};
+        const spec = {"type": "enum", "values": [1, 2, "3"]};
         this.test("normal", function(){
             assert.equal(validate.value(spec, 1), 1);
             assert.equal(validate.value(spec, 2), 2);
             assert.equal(validate.value(spec, "2"), 2);
-            assert.equal(validate.value(spec, "three"), "three");
+            assert.equal(validate.value(spec, "3"), "3");
+            assert.equal(validate.value(spec, 3), "3");
             throwsErrorWith(() => validate.value(spec, "not valid"),
-                `Expected either 1, 2, or "three": Value isn't in the enumeration.`
+                `Expected either 1, 2, or "3": Value isn't in the enumeration.`
             );
         });
         this.test("strict", function(){
             assert.equal(validate.strict(spec, 1), 1);
             assert.equal(validate.strict(spec, 2), 2);
-            assert.equal(validate.strict(spec, "three"), "three");
+            assert.equal(validate.strict(spec, "3"), "3");
             throwsErrorWith(() => validate.strict(spec, "2"),
-                `Expected either 1, 2, or "three": Value isn't in the enumeration.`
+                `Expected either 1, 2, or "3": Value isn't in the enumeration.`
+            );
+            throwsErrorWith(() => validate.strict(spec, 3),
+                `Expected either 1, 2, or "3": Value isn't in the enumeration.`
             );
             throwsErrorWith(() => validate.strict(spec, "not valid"),
-                `Expected either 1, 2, or "three": Value isn't in the enumeration.`
+                `Expected either 1, 2, or "3": Value isn't in the enumeration.`
+            );
+        });
+        this.test("allowed values include NaN", function(){
+            const nanSpec = {"type": "enum", "values": [1, NaN]};
+            assert.equal(validate.value(spec, 1), 1);
+            assertIsNaN(validate.value(nanSpec, NaN));
+            throwsErrorWith(() => validate.value(nanSpec, "not valid"),
+                `Expected either 1 or NaN: Value isn't in the enumeration.`
             );
         });
         this.test("no options", function(){
