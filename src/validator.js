@@ -2,25 +2,12 @@
 // validate a given value, and provide human-readable information
 // to provide to an end user in case of a validation error.
 class Validator{
-    // Add any number of validator objects. Each argument represents
-    // one validator to be added. Validators may be given as
-    // Validator instances or as options objects to be passed to the
-    // Validator constructor to create such instances.
-    // The function returns the first added validator.
-    static add(...validators){
-        let first;
-        for(let validator of validators){
-            const next = Validator.addOne(validator);
-            first = first || next;
-        }
-        return first;
-    }
     // Add one validator object.
     // The Validator may be given as a Validator instance or as 
     // an options object to be passed to the Validator constructor
     // to create such an instance.
     // The function returns the added validator.
-    static addOne(validator){
+    static add(validator){
         validator = (validator instanceof Validator ?
             validator : new Validator(validator)
         );
@@ -44,7 +31,7 @@ class Validator{
                 "Invalid validator."
             );
         }
-        return Validator.addOne({
+        return Validator.add({
             name: alias,
             defaultPath: validator.defaultPath,
             defaultValue: validator.defaultValue,
@@ -55,15 +42,9 @@ class Validator{
             validate: validator.validate,
         });
     }
-    // Remove any number of validators.
-    // Validators can be passed as Validator instances or identified
-    // by their name strings.
-    static remove(...validators){
-        validators.forEach(Validator.removeOne);
-    }
     // Remove a single validator. The validator can be passed as a
     // Validator instance or as a name string.
-    static removeOne(validator){
+    static remove(validator){
         if(!validator){
             throw new Error("No validator given.");
         }else if(typeof(validator) === "string"){

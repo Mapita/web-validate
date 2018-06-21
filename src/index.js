@@ -32,11 +32,9 @@ const validateExport = {
     Path: ValidationPath,
     // Validator type and static functions
     Validator: Validator,
-    addValidators: Validator.add,
-    addValidator: Validator.addOne,
+    addValidator: Validator.add,
     addValidatorAlias: Validator.addAlias,
-    removeValidators: Validator.remove,
-    removeValidator: Validator.removeOne,
+    removeValidator: Validator.remove,
     // Copy values without sensitive fields
     copyWithoutSensitive: copyWithoutSensitive,
 };

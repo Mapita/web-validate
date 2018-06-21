@@ -660,45 +660,22 @@ function makeTests(validate){
                 "Expected true."
             );
         });
-        this.test("add multiple custom validators", function(){
-            validate.addValidators({
-                name: "hello",
-                validate: () => "hello",
-            }, {
-                name: "world",
-                validate: () => "world",
-            });
-            assert.equal(validate.value("hello", null), "hello");
-            assert.equal(validate.value("world", null), "world");
-        });
         this.test("add a validator alias", function(){
             validate.addValidatorAlias("trueAlias", "true");
             assert.equal(validate.value("true", 1), true);
             assert.equal(validate.value("trueAlias", 1), true);
         });
         this.test("remove a custom validator", function(){
-            validate.removeValidator("hello");
-            assert.equal(validate.value("true", true), true);
-            assert.equal(validate.value("world", null), "world");
-            throwsErrorWith(() => validate.value("hello", null),
-                `Unknown validator "hello".`
-            );
-        });
-        this.test("remove multiple custom validators", function(){
-            validate.removeValidators(trueValidator, "trueAlias", "world");
-            assert.equal(validate.value("number", 100), 100);
-            assert.equal(validate.value("string", "ok"), "ok");
+            validate.removeValidator("true");
+            assert.equal(validate.value("trueAlias", 1), true);
             throwsErrorWith(() => validate.value("true", null),
                 `Unknown validator "true".`
             );
+            validate.removeValidator("trueAlias");
+            assert.equal(validate.value("number", 100), 100);
+            assert.equal(validate.value("string", "ok"), "ok");
             throwsErrorWith(() => validate.value("trueAlias", null),
                 `Unknown validator "trueAlias".`
-            );
-            throwsErrorWith(() => validate.value("hello", null),
-                `Unknown validator "hello".`
-            );
-            throwsErrorWith(() => validate.value("world", null),
-                `Unknown validator "world".`
             );
         });
         this.test("attempt to add an invalid validator", function(){
