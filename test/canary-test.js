@@ -612,6 +612,92 @@ function makeTests(validate){
         });
     });
     
+    canary.group("copy without sensitive attributes", function(){
+        const oneSpec = {"type": "number", "sensitive": true};
+        const listSpec = {
+            "type": "list",
+            "each": {
+                "type": "number",
+                "sensitive": true,
+            },
+        };
+        const objSpec = {
+            "type": "object",
+            "attributes": {
+                "sensitive": {"type": "boolean", "sensitive": true},
+                "insensitive": {"type": "boolean"},
+            },
+        };
+        const complexSpec = {
+            "type": "list",
+            "each": {
+                "type": "object",
+                "attributes": {
+                    "insensitiveNumber": {"type": "number"},
+                    "sensitiveNumber": {
+                        "type": "number",
+                        "sensitive": true,
+                    },
+                    "list": {
+                        "type": "list",
+                        "sensitive": true,
+                        "each": {"type": "number"},
+                    },
+                },
+            },
+        };
+        this.test("single sensitive value", function(){
+            assert.equal(validate.copyWithoutSensitive(oneSpec, 100), undefined);
+        });
+        this.test("list", function(){
+            assert.equal(
+                validate.copyWithoutSensitive(listSpec, []), undefined
+            );
+            assert.equal(
+                validate.copyWithoutSensitive(listSpec, [1, 2, 3]), undefined
+            );
+        });
+        this.test("object", function(){
+            assert.deepEqual(validate.copyWithoutSensitive(objSpec, {
+                "sensitive": true,
+                "insensitive": false,
+            }), {
+                "insensitive": false,
+            });
+        });
+        this.test("nested objects and lists", function(){
+            assert.deepEqual(validate.copyWithoutSensitive(complexSpec, [
+                {
+                    "insensitiveNumber": 1,
+                    "sensitiveNumber": 2,
+                    "list": [],
+                },
+                {
+                    "insensitiveNumber": 3,
+                    "sensitiveNumber": 4,
+                    "list": [1, 2, 3],
+                },
+            ]), [
+                {
+                    "insensitiveNumber": 1,
+                },
+                {
+                    "insensitiveNumber": 3,
+                },
+            ]);
+        });
+        this.test("attributes helper", function(){
+            assert.deepEqual(validate.copyWithoutSensitiveAttributes(
+                objSpec["attributes"], {
+                    "sensitive": true,
+                    "insensitive": false,
+                }
+            ), {
+                "insensitive": false,
+            });
+        });
+    });
+    
     return canary;
 }
 
