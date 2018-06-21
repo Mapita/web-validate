@@ -235,6 +235,10 @@ const numericValidator = Validator.add({
 const numberValidator = Validator.add({
     name: "number",
     defaultValue: 0,
+    parameters: {
+        "minimum": "The minimum allowed value for the number.",
+        "maximum": "The maximum allowed value for the number.",
+    },
     describe: function(specification){
         return describeNumberValidator("a finite number", specification);
     },
@@ -256,6 +260,10 @@ const numberValidator = Validator.add({
 const integerValidator = Validator.add({
     name: "integer",
     defaultValue: 0,
+    parameters: {
+        "minimum": "The minimum allowed value for the number.",
+        "maximum": "The maximum allowed value for the number.",
+    },
     describe: function(specification){
         return describeNumberValidator("an integer", specification);
     },
@@ -278,6 +286,10 @@ const integerValidator = Validator.add({
 const indexValidator = Validator.add({
     name: "index",
     defaultValue: 0,
+    parameters: {
+        "minimum": "The minimum allowed value for the number.",
+        "maximum": "The maximum allowed value for the number.",
+    },
     describe: function(specification){
         return describeNumberValidator("a non-negative integer index", specification);
     },
@@ -300,8 +312,8 @@ const stringValidator = Validator.add({
     name: "string",
     defaultValue: "",
     parameters: {
-        "minimum": "The string must contain at least this many characters.",
-        "maximum": "The string must not contain more characters than this.",
+        "minLength": "The string must contain at least this many characters.",
+        "maxLength": "The string must not contain more characters than this.",
         "pattern": "A regular expression that the string must fully match.",
     },
     describe: function(specification){
@@ -369,13 +381,13 @@ const timestampValidator = Validator.add({
     name: "timestamp",
     defaultValue: new Date(0),
     parameters: {
-        "minimum": "The date must not be any earlier than this Date object.",
-        "maximum": "The date must not be any later than this Date object.",
+        "minDate": "The date must not be any earlier than this Date object.",
+        "maxDate": "The date must not be any later than this Date object.",
     },
     describe: function(specification){
         const format = specification.format || timestampValidator.defaultFormat;
-        const minDate = tryGetDate(specification.minimum);
-        const maxDate = tryGetDate(specification.maximum);
+        const minDate = tryGetDate(specification.minDate);
+        const maxDate = tryGetDate(specification.maxDate);
         const min = minDate && minDate.toISOString();
         const max = maxDate && maxDate.toISOString();
         if(min && max){
@@ -395,12 +407,12 @@ const timestampValidator = Validator.add({
         }catch(error){
             throw new ValueError("Value isn't a valid date.");
         }
-        const minDate = tryGetDate(specification.minimum);
-        const maxDate = tryGetDate(specification.maximum);
+        const minDate = tryGetDate(specification.minDate);
+        const maxDate = tryGetDate(specification.maxDate);
         if(minDate && date < minDate.getTime()){
-            throw new ValueError("Date is before the low bound.");
+            throw new ValueError("Date is before the minimum date.");
         }else if(maxDate && date > maxDate.getTime()){
-            throw new ValueError("Date is after the high bound.");
+            throw new ValueError("Date is after the maximum date.");
         }
         return date;
     },

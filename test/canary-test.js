@@ -298,31 +298,31 @@ function makeTests(validate){
             );
         });
         this.test("bounds", function(){
-            const minSpec = {"type": "timestamp", "minimum": "2010-01-01"};
+            const minSpec = {"type": "timestamp", "minDate": "2010-01-01"};
             assert.deepEqual(validate.strict(minSpec, "2018-01-01T00:00:00Z"),
                 new Date("2018-01-01T00:00:00Z")
             );
             throwsErrorWith(() => validate.strict(minSpec, "2000-01-01T00:00:00Z"),
-                "Date is before the low bound"
+                "Date is before the minimum date"
             );
-            const maxSpec = {"type": "timestamp", "maximum": "2020-01-01"};
+            const maxSpec = {"type": "timestamp", "maxDate": "2020-01-01"};
             assert.deepEqual(validate.strict(maxSpec, "2018-01-01T00:00:00Z"),
                 new Date("2018-01-01T00:00:00Z")
             );
             throwsErrorWith(() => validate.strict(maxSpec, "2040-01-01T00:00:00Z"),
-                "Date is after the high bound"
+                "Date is after the maximum date"
             );
             const bothSpec = {"type": "timestamp",
-                "minimum": "2010-01-01", "maximum": "2020-01-01"
+                "minDate": "2010-01-01", "maxDate": "2020-01-01"
             };
             assert.deepEqual(validate.strict(bothSpec, "2018-01-01T00:00:00Z"),
                 new Date("2018-01-01T00:00:00Z")
             );
             throwsErrorWith(() => validate.strict(bothSpec, "2000-01-01T00:00:00Z"),
-                "Date is before the low bound"
+                "Date is before the minimum date"
             );
             throwsErrorWith(() => validate.strict(bothSpec, "2040-01-01T00:00:00Z"),
-                "Date is after the high bound"
+                "Date is after the maximum date"
             );
         });
         this.test("dayjs date input", function(){
