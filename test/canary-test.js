@@ -234,7 +234,7 @@ function makeTests(validate){
             throwsErrorWith(() => validate.strict(spec, 123), "Value isn't a string");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't a string");
         });
-        this.test("length", function(){
+        this.test("length bounds", function(){
             const boundSpec = {"type": "string", "minLength": 5, "maxLength": 6};
             assert.equal(validate.strict(boundSpec, "right"), "right");
             throwsErrorWith(() => validate.strict(boundSpec, "puny"),
@@ -448,7 +448,7 @@ function makeTests(validate){
                "Expected a finite number at list[1]: Value isn't numeric."
            ); 
         });
-        this.test("length", function(){
+        this.test("length bounds", function(){
             const boundSpec = {"type": "list", "minLength": 2, "maxLength": 4};
             assert.deepEqual(validate.strict(boundSpec, [1, 2]), [1, 2]);
             throwsErrorWith(() => validate.strict(boundSpec, []),
@@ -466,6 +466,23 @@ function makeTests(validate){
             const badSpec = {"type": "list", "each": "not a validator"};
             throwsErrorWith(() => validate.strict(badSpec, []),
                 `Unknown validator "not a validator".`
+            );
+        });
+        this.test("no infinite loop on infinite generator input", function(){
+            const iter = function*(){
+                let i = 0;
+                while(++i){
+                    if(i >= 50000) throw new Error("Iterator never terminated.");
+                    yield i;
+                }
+            };
+            throwsErrorWith(() => validate.value("list", iter()),
+                "List is too long"
+            );
+            throwsErrorWith(() => validate.value(
+                {"type": "list", "maxLength": Infinity}, iter()
+            ),
+                "Iterator never terminated."
             );
         });
     });

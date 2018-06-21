@@ -21,8 +21,8 @@ function validateList(specification, list, path, strict){
     const validatedArray = [];
     // Decide on max length - use a default if unspecified to guard against
     // the possibility of an infinite iterator
-    const maxLength = (Number.isFinite(+specification.maxLength) ?
-        +specification.maxLength : validateList.defaultMaxLength
+    const maxLength = (Number.isNaN(+specification.maxLength) ?
+        validateList.defaultMaxLength : +specification.maxLength
     );
     // Validate each element in the list
     for(let element of list){

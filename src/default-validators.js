@@ -211,12 +211,12 @@ const numericValidator = Validator.add({
         )){
             throw new ValueError("Value isn't numeric.");
         }
-        if(Number.isFinite(specification.minimum) &&
+        if(Number.isFinite(+specification.minimum) &&
             number < +specification.minimum
         ){
             throw new ValueError("Number is too small.");
         }
-        if(Number.isFinite(specification.maximum) &&
+        if(Number.isFinite(+specification.maximum) &&
             number > +specification.maximum
         ){
             throw new ValueError("Number is too large.");
