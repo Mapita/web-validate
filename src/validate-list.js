@@ -6,7 +6,7 @@ function validateList(specification, list, path, strict){
     path = path || new ValidationPath();
     // Check that the input is really some kind of list (i.e. is iterable)
     if(!list || !list[Symbol.iterator] ||
-        !(list[Symbol.iterator] instanceof Function) ||
+        typeof(list[Symbol.iterator]) !== "function" ||
         typeof(list) === "string"
     ){
         throw new ValidatorError("Value isn't a list.");

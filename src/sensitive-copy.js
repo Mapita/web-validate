@@ -1,23 +1,16 @@
+const getValidator = require("./get-validator");
+
 // Create a copy of an object with sensitive fields removed
 function copyWithoutSensitive(specification, value){
+    if(!specification || typeof(specification) !== "object"){
+        throw new Error("Copying requires a specification object.");
+    }
     if(specification.sensitive){
         return undefined;
-    }else if(value && typeof(value) !== "string" &&
-        typeof(value[Symbol.iterator]) === "function" && specification.each
-    ){
-        const array = [];
-        for(let element of value){
-            array.push(copyWithoutSensitive(specification.each, element));
-        }
-        return array;
-    }else if(typeof(value) === "object" && specification.attributes){
-        const object = {};
-        for(let key in specification.attributes){
-            object[key] = copyWithoutSensitive(
-                specification.attributes[key], value[key]
-            );
-        }
-        return object;
+    }
+    const validator = getValidator(specification);
+    if(typeof(validator.copyWithoutSensitive) === "function"){
+        return validator.copyWithoutSensitive(specification, value);
     }else{
         return value;
     }

@@ -6,6 +6,8 @@ const ValidatorError = require("./validator-error");
 const validateList = require("./validate-list");
 const validateObject = require("./validate-object");
 
+const copyWithoutSensitive = require("./sensitive-copy");
+
 const englishList = require("./english-list");
 
 // Helper for number validators
@@ -466,6 +468,16 @@ const listValidator = Validator.add({
     validate: function(specification, value, path, strict){
         return validateList(specification, value, path, strict);
     },
+    copyWithoutSensitive: function(specification, value){
+        if(specification.sensitive || (
+            specification.each && specification.each.sensitive
+        )){
+            return undefined;
+        }
+        return Array.prototype.map.call(value,
+            element => copyWithoutSensitive(specification.each, element)
+        );
+    },
 });
 
 // Validator for objects
@@ -485,5 +497,23 @@ const objectValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         return validateObject(specification, value, path, strict);
+    },
+    copyWithoutSensitive: function(specification, value){
+        if(specification.sensitive || !specification.attributes ||
+            typeof(specification.attributes) !== "object"
+        ){
+            return undefined;
+        }
+        const object = {};
+        let anyInsensitive = false;
+        for(let key in specification.attributes){
+            if(!specification.attributes[key].sensitive){
+                anyInsensitive = true;
+                object[key] = copyWithoutSensitive(
+                    specification.attributes[key], value[key]
+                );
+            }
+        }
+        return anyInsensitive ? object : undefined;
     },
 });
