@@ -13,6 +13,9 @@ function validateValue(specification, value, path, strict){
     )){
         throw new Error("Validation requires a specification object.");
     }
+    if(typeof(specification) === "string"){
+        specification = {"type": specification};
+    }
     // Get a Validator instance given the specification
     const validator = getValidator(specification);
     // Get a ValidatorPath instance
