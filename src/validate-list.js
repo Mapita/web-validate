@@ -1,6 +1,8 @@
 const validateValue = require("./validate-value");
 const ValueError = require("./value-error");
 
+const getValidator = require("./get-validator");
+
 // Helper to validate a list of values
 function validateList(specification, list, path, strict){
     path = path || new ValidationPath();
@@ -11,13 +13,10 @@ function validateList(specification, list, path, strict){
     ){
         throw new ValueError("Value isn't a list.");
     }
-    // Make sure the spec looks right
-    if(specification.each && typeof(specification.each) !== "object"){
-        throw new Error(
-            `Specification's "each" attribute, when included, ` +
-            `is required to be a specification object.`
-        );
-    }
+    // Verifies that the "each" validator is ok, if given
+    const eachValidator = (
+        specification.each && getValidator(specification.each)
+    );
     // This is the validated array that will be returned
     const validatedArray = [];
     // Decide on max length - use a default if unspecified to guard against
@@ -27,7 +26,7 @@ function validateList(specification, list, path, strict){
     );
     // Validate each element in the list
     for(let element of list){
-        if(specification.each){
+        if(eachValidator){
             const nextPath = path.getNextPath(validatedArray.length);
             validatedArray.push(validateValue(
                 specification.each, element, nextPath, strict
