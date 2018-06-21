@@ -17,31 +17,6 @@ class Validator{
         Validator.byName[validator.name] = validator;
         return validator;
     }
-    // Helper to add one validator object which aliases an existing
-    // known valdiator. The known validator can be provided as either
-    // a handle to a Validator instance of as a name of an existing
-    // validator.
-    static addAlias(alias, toValidator){
-        const validator = (typeof(toValidator) === "string" ?
-            Validator.byName[toValidator] : toValidator
-        );
-        if(!(validator instanceof Validator)){
-            throw new Error(typeof(toValidator) === "string" ?
-                `Unknown validator "${toValidator}".` :
-                "Invalid validator."
-            );
-        }
-        return Validator.add({
-            name: alias,
-            defaultPath: validator.defaultPath,
-            defaultValue: validator.defaultValue,
-            getDefaultValue: validator.getDefaultValue,
-            copyWithoutSensitive: validator.copyWithoutSensitive,
-            parameters: validator.parameters,
-            describe: validator.describe,
-            validate: validator.validate,
-        });
-    }
     // Remove a single validator. The validator can be passed as a
     // Validator instance or as a name string.
     static remove(validator){

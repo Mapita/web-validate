@@ -682,22 +682,12 @@ function makeTests(validate){
                 "Expected true."
             );
         });
-        this.test("add a validator alias", function(){
-            validate.addValidatorAlias("trueAlias", "true");
-            assert.equal(validate.value("true", 1), true);
-            assert.equal(validate.value("trueAlias", 1), true);
-        });
         this.test("remove a custom validator", function(){
             validate.removeValidator("true");
-            assert.equal(validate.value("trueAlias", 1), true);
-            throwsErrorWith(() => validate.value("true", null),
-                `Unknown validator "true".`
-            );
-            validate.removeValidator("trueAlias");
             assert.equal(validate.value("number", 100), 100);
             assert.equal(validate.value("string", "ok"), "ok");
-            throwsErrorWith(() => validate.value("trueAlias", null),
-                `Unknown validator "trueAlias".`
+            throwsErrorWith(() => validate.value("true", null),
+                `Unknown validator "true".`
             );
         });
         this.test("attempt to add an invalid validator", function(){
