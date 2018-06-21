@@ -479,8 +479,8 @@ const listValidator = Validator.add({
     defaultPath: "list",
     getDefaultValue: () => [],
     parameters: {
-        "minimum": "The list must contain at least this many elements.",
-        "maximum": "The list must not contain more elements than this.",
+        "minLength": "The list must contain at least this many elements.",
+        "maxLength": "The list must not contain more elements than this.",
         "each": "Describes a validator for each element in the list.",
     },
     describe: function(specification){
