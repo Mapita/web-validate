@@ -877,6 +877,33 @@ function makeTests(validate){
         });
     });
     
+    canary.group("call functions with too few arguments", function(){
+        this.test("validate.value", function(){
+            throwsErrorWith(() => validate.value(),
+                "Function requires at least two arguments."
+            );
+            throwsErrorWith(() => validate.value("boolean"),
+                "Function requires at least two arguments."
+            );
+        });
+        this.test("validate.strict", function(){
+            throwsErrorWith(() => validate.strict(),
+                "Function requires at least two arguments."
+            );
+            throwsErrorWith(() => validate.strict("boolean"),
+                "Function requires at least two arguments."
+            );
+        });
+        this.test("validate.copyWithoutSensitive", function(){
+            throwsErrorWith(() => validate.copyWithoutSensitive(),
+                "Function requires at least two arguments."
+            );
+            throwsErrorWith(() => validate.copyWithoutSensitive("boolean"),
+                "Function requires at least two arguments."
+            );
+        });
+    });
+    
     return canary;
 }
 

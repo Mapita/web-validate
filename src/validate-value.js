@@ -5,6 +5,9 @@ const ValidationPath = require("./validation-path");
 
 // Validate a single value of any type
 function validateValue(specification, value, path, strict){
+    if(arguments.length < 2){
+        throw new Error("Function requires at least two arguments.");
+    }
     // Verify that some kind of spec was given
     if(!specification || (
         typeof(specification) !== "string" &&
@@ -16,7 +19,15 @@ function validateValue(specification, value, path, strict){
         specification = {"type": specification};
     }
     // Get a Validator instance given the specification
-    const validator = Validator.get(specification);
+    let validator;
+    try{
+        validator = Validator.get(specification);
+    }catch(error){
+        if(path) error.message = (
+            error.message.slice(-1) + " at " + path.toString()
+        );
+        throw error;
+    }
     // Get a ValidatorPath instance
     if(typeof(path) === "string" || typeof(path) === "number"){
         path = new ValidationPath(path);

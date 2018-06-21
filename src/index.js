@@ -17,6 +17,9 @@ require("./default-validators");
 
 // A convenience wrapper function
 function validateValueStrict(specification, value, path){
+    if(arguments.length < 2){
+        throw new Error("Function requires at least two arguments.");
+    }
     return validateValue(specification, value, path, true);
 }
 
