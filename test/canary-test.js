@@ -384,10 +384,10 @@ function makeTests(validate){
         });
         this.test("no options", function(){
             throwsErrorWith(() => validate.strict({"type": "enum"}, 0),
-                "Expected nothing: Enumeration accepts no values."
+                "Enumeration accepts no values."
             );
             throwsErrorWith(() => validate.strict({"type": "enum", "values": []}, 0),
-                "Expected nothing: Enumeration accepts no values."
+                "Enumeration accepts no values."
             );
         });
         this.test("one option", function(){

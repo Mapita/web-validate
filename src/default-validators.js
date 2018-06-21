@@ -448,7 +448,7 @@ const enumValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         if(!Array.isArray(specification.values) || !specification.values.length){
-            throw new ValueError("Enumeration accepts no values.");
+            throw new Error("Enumeration accepts no values.");
         }
         for(let option of specification.values){
             if(value === option || (value !== value && option !== option) || (
