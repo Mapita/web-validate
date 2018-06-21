@@ -46,7 +46,7 @@ web-friendly documentation for these wrapped endpoints.
     - [enum](#enum)
     - [list](#list)
     - [object](#object)
-- [Full API documentation](full-api-documentation)
+- [Full API documentation](#full-api-documentation)
     - [validate.value](#validatevalue)
     - [validate.strict](#validatestrict)
     - [validate.Error](#validateerror)
