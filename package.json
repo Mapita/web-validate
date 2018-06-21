@@ -42,6 +42,7 @@
     }
   ],
   "scripts": {
-    "test": "node test/canary-test.js"
+    "test": "node test/canary-test.js",
+    "prepublish": "npm test"
   }
 }
