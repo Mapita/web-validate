@@ -1,7 +1,6 @@
+const Validator = require("./validator");
 const validateValue = require("./validate-value");
 const ValueError = require("./value-error");
-
-const getValidator = require("./get-validator");
 
 // Helper to validate a list of values
 function validateList(specification, list, path, strict){
@@ -15,7 +14,7 @@ function validateList(specification, list, path, strict){
     }
     // Verifies that the "each" validator is ok, if given
     const eachValidator = (
-        specification.each && getValidator(specification.each)
+        specification.each && Validator.get(specification.each)
     );
     // This is the validated array that will be returned
     const validatedArray = [];

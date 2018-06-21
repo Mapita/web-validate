@@ -1,6 +1,6 @@
+const Validator = require("./validator");
 const validateValue = require("./validate-value");
 const ValueError = require("./value-error");
-const getValidator = require("./get-validator");
 
 // Helper to validate an object
 function validateObject(specification, object, path, strict){
@@ -28,7 +28,7 @@ function validateObject(specification, object, path, strict){
     for(let key in specification.attributes){
         const attrSpec = specification.attributes[key];
         if(!object.hasOwnProperty(key)){
-            const attrValidator = getValidator(attrSpec);
+            const attrValidator = Validator.get(attrSpec);
             if(!attrSpec.optional && !("default" in attrSpec)){
                 throw new ValueError(`Missing required attribute "${key}".`);
             }else if("default" in attrSpec){

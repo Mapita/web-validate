@@ -682,6 +682,9 @@ function makeTests(validate){
                 "Expected true."
             );
         });
+        this.test("get a validator", function(){
+            assert.equal(validate.getValidator("true"), trueValidator);
+        });
         this.test("remove a custom validator", function(){
             validate.removeValidator("true");
             assert.equal(validate.value("number", 100), 100);

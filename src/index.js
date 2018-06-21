@@ -33,6 +33,7 @@ const validateExport = {
     // Validator type and static functions
     Validator: Validator,
     addValidator: Validator.add,
+    getValidator: Validator.get,
     removeValidator: Validator.remove,
     // Copy values without sensitive fields
     copyWithoutSensitive: copyWithoutSensitive,

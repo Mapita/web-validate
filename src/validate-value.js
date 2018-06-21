@@ -2,7 +2,6 @@ const Validator = require("./validator");
 const ValueError = require("./value-error");
 const ValidationError = require("./validation-error");
 const ValidationPath = require("./validation-path");
-const getValidator = require("./get-validator");
 
 // Validate a single value of any type
 function validateValue(specification, value, path, strict){
@@ -17,7 +16,7 @@ function validateValue(specification, value, path, strict){
         specification = {"type": specification};
     }
     // Get a Validator instance given the specification
-    const validator = getValidator(specification);
+    const validator = Validator.get(specification);
     // Get a ValidatorPath instance
     if(typeof(path) === "string" || typeof(path) === "number"){
         path = new ValidationPath(path);
