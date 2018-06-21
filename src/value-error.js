@@ -1,9 +1,9 @@
 // These are the errors that are thrown internally by validators to be
 // handled by the validateValue and related functions.
-// A ValidatorError indicates a known case involving incorrect input.
+// A ValueError indicates a known case involving incorrect input.
 
 // The constructor
-function ValidatorError(message){
+function ValueError(message){
     Error.call(this);
     this.message = message;
     // https://nodejs.org/api/errors.html#errors_error_capturestacktrace_targetobject_constructoropt
@@ -19,15 +19,15 @@ function ValidatorError(message){
 }
 
 // Prototype wrangling
-ValidatorError.prototype = Object.create(Error.prototype);
-ValidatorError.prototype.name = "ValidatorError";
-ValidatorError.prototype.constructor = ValidatorError;
+ValueError.prototype = Object.create(Error.prototype);
+ValueError.prototype.name = "ValueError";
+ValueError.prototype.constructor = ValueError;
 
-ValidatorError.toJSON = function(){
+ValueError.toJSON = function(){
     return {
         message: this.message,
         stack: this.stack,
     };
 };
 
-module.exports = ValidatorError;
+module.exports = ValueError;

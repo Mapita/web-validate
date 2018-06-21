@@ -45,7 +45,7 @@ class Validator{
             );
         }
         return Validator.addOne({
-            name: "alias",
+            name: alias,
             defaultPath: validator.defaultPath,
             defaultValue: validator.defaultValue,
             getDefaultValue: validator.getDefaultValue,
@@ -103,8 +103,22 @@ class Validator{
         if(typeof(this.validate) !== "function") throw new Error(
             "Options must include a \"validate\" function."
         );
+        if(this.parameters && typeof(this.parameters) !== "object"){
+            throw new Error("Field \"parameters\" must be an object.");
+        }
+        if(this.describe && typeof(this.describe) !== "function"){
+            throw new Error("Field \"describe\" must be a function.");
+        }
+        if(this.getDefaultValue && typeof(this.getDefaultValue) !== "function"){
+            throw new Error("Field \"getDefaultValue\" must be a function.");
+        }
     }
 }
+
+// Used when a description function isn't provided.
+Validator.defaultDescribeFunction = function(){
+    return `some ${this.name}`
+};
 
 // Map used to look up validators by name.
 Validator.byName = {};

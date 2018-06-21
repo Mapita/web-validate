@@ -1,7 +1,7 @@
 const inspect = require("util").inspect;
 
 const Validator = require("./validator");
-const ValidatorError = require("./validator-error");
+const ValueError = require("./value-error");
 
 const validateList = require("./validate-list");
 const validateObject = require("./validate-object");
@@ -43,10 +43,10 @@ function validateListLength(name, specification, list){
     const min = +specification.minLength;
     const max = +specification.maxLength;
     if(Number.isFinite(min) && list.length < min){
-        throw new ValidatorError(`${name} is too short.`);
+        throw new ValueError(`${name} is too short.`);
     }
     if(Number.isFinite(max) && list.length > max){
-        throw new ValidatorError(`${name} is too long.`);
+        throw new ValueError(`${name} is too long.`);
     }
     return list;
 }
@@ -141,10 +141,10 @@ function getDate(date){
         result = date.toJSDate();
     }
     if(!(result instanceof Date)){
-        throw new ValidatorError("Value does not represent a date.");
+        throw new ValueError("Value does not represent a date.");
     }
     if(!Number.isFinite(result.getTime())){
-        throw new ValidatorError("Timestamp isn't a finite number.");
+        throw new ValueError("Timestamp isn't a finite number.");
     }
     return result;
 }
@@ -174,7 +174,7 @@ const booleanValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         if(strict && value !== true && value !== false){
-            throw new ValidatorError("Value isn't a boolean.");
+            throw new ValueError("Value isn't a boolean.");
         }
         if(!strict && typeof(value) === "string" &&
             value.toLowerCase() === "false"
@@ -209,17 +209,17 @@ const numericValidator = Validator.add({
         if(typeof(number) !== "number" || (
             number !== number && (value === value && value !== "NaN")
         )){
-            throw new ValidatorError("Value isn't numeric.");
+            throw new ValueError("Value isn't numeric.");
         }
         if(Number.isFinite(specification.minimum) &&
             number < +specification.minimum
         ){
-            throw new ValidatorError("Number is too small.");
+            throw new ValueError("Number is too small.");
         }
         if(Number.isFinite(specification.maximum) &&
             number > +specification.maximum
         ){
-            throw new ValidatorError("Number is too large.");
+            throw new ValueError("Number is too large.");
         }
         return number;
     },
@@ -243,7 +243,7 @@ const numberValidator = Validator.add({
             specification, value, path, strict
         );
         if(!Number.isFinite(number)){
-            throw new ValidatorError("Value isn't a finite number.");
+            throw new ValueError("Value isn't a finite number.");
         }
         return number;
     },
@@ -264,7 +264,7 @@ const integerValidator = Validator.add({
             specification, value, path, strict
         );
         if(!Number.isInteger(number)){
-            throw new ValidatorError("Value isn't an integer.");
+            throw new ValueError("Value isn't an integer.");
         }
         return number;
     },
@@ -286,7 +286,7 @@ const indexValidator = Validator.add({
             specification, value, path, strict
         );
         if(number < 0){
-            throw new ValidatorError("Value is less than zero.");
+            throw new ValueError("Value is less than zero.");
         }
         return number;
     },
@@ -316,7 +316,7 @@ const stringValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         if(strict && typeof(value) !== "string"){
-            throw new ValidatorError("Value isn't a string.");
+            throw new ValueError("Value isn't a string.");
         }
         value = validateListLength("String", specification, (
             value === null || value === undefined ? "" : String(value)
@@ -327,7 +327,7 @@ const stringValidator = Validator.add({
                 const pattern = (typeof(specification.pattern) === "string" ?
                     `/${specification.pattern}/` : specification.pattern
                 );
-                throw new ValidatorError(
+                throw new ValueError(
                     `String doesn't match the regular expression.`
                 );
             }
@@ -348,11 +348,11 @@ const emailAddressValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         if(typeof(value) !== "string"){
-            throw new ValidatorError("Value isn't a string.");
+            throw new ValueError("Value isn't a string.");
         }
         const email = String(value).toLowerCase();
         if(email.indexOf("@") < 0){
-            throw new ValidatorError("Value does not contain a '@' character.");
+            throw new ValueError("Value does not contain a '@' character.");
         }
         return email;
     },
@@ -393,14 +393,14 @@ const timestampValidator = Validator.add({
         try{
             date = getDate(value);
         }catch(error){
-            throw new ValidatorError("Value isn't a valid date.");
+            throw new ValueError("Value isn't a valid date.");
         }
         const minDate = tryGetDate(specification.minimum);
         const maxDate = tryGetDate(specification.maximum);
         if(minDate && date < minDate.getTime()){
-            throw new ValidatorError("Date is before the low bound.");
+            throw new ValueError("Date is before the low bound.");
         }else if(maxDate && date > maxDate.getTime()){
-            throw new ValidatorError("Date is after the high bound.");
+            throw new ValueError("Date is after the high bound.");
         }
         return date;
     },
@@ -427,7 +427,7 @@ const enumValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         if(!Array.isArray(specification.values) || !specification.values.length){
-            throw new ValidatorError("Enumeration accepts no values.");
+            throw new ValueError("Enumeration accepts no values.");
         }
         for(let option of specification.values){
             if(value === option || (value !== value && option !== option) || (
@@ -436,7 +436,7 @@ const enumValidator = Validator.add({
                 return option;
             }
         }
-        throw new ValidatorError("Value isn't in the enumeration.");
+        throw new ValueError("Value isn't in the enumeration.");
     },
     getDefaultValue(specification){
         return (

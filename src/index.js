@@ -1,6 +1,6 @@
 // Important classes
 const Validator = require("./validator");
-const ValidatorError = require("./validator-error");
+const ValueError = require("./value-error");
 const ValidationError = require("./validation-error");
 const ValidationPath = require("./validation-path");
 
@@ -27,14 +27,24 @@ function validateAttributesStrict(specification, value, path){
 
 // Module object to export
 const validateExport = {
+    // Validate values
     value: validateValue,
     attributes: validateAttributes,
     strict: validateValueStrict,
     strictAttributes: validateAttributesStrict,
+    // Error types
     Error: ValidationError,
-    ValidatorError: ValidatorError,
+    ValueError: ValueError,
+    // Path type
     Path: ValidationPath,
+    // Validator type and static functions
     Validator: Validator,
+    addValidators: Validator.add,
+    addValidator: Validator.addOne,
+    addValidatorAlias: Validator.addAlias,
+    removeValidators: Validator.remove,
+    removeValidator: Validator.removeOne,
+    // Copy values without sensitive fields
     copyWithoutSensitive: copyWithoutSensitive,
     copyWithoutSensitiveAttributes: copyWithoutSensitiveAttributes,
 };

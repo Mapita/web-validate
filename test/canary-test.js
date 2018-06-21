@@ -458,6 +458,10 @@ function makeTests(validate){
                 "List is too long"
             );
         });
+        this.test("invalid \"each\" specification", function(){
+            const badSpec = {"type": "list", "each": "not a validator"};
+            assert.throws(() => validate.strict(badSpec, []), Error);
+        });
     });
     
     canary.group("object validator", function(){
@@ -538,6 +542,10 @@ function makeTests(validate){
                 "nullableDefault": null,
             });
         });
+        this.test("invalid \"attributes\" specification", function(){
+            const badSpec = {"type": "object", "attributes": "nope"};
+            assert.throws(() => validate.strict(badSpec, {}), Error);
+        });
     });
     
     canary.test("deeply nested specification", function(){
@@ -616,6 +624,152 @@ function makeTests(validate){
         });
     });
     
+    canary.series("custom validators", function(){
+        let trueValidator;
+        this.test("add a custom validator", function(){
+            trueValidator = validate.addValidator({
+                name: "true",
+                validate: (specification, value, path, strict) => {
+                    if(strict && value !== true){
+                        throw new validate.ValueError("Expected true.");
+                    }
+                    return true;
+                },
+            });
+            assert.equal(validate.value("true", true), true);
+            assert.equal(validate.value("true", 1), true);
+            assert.equal(validate.value({"type": "true"}, 1), true);
+            assert.equal(validate.value(trueValidator, 1), true);
+            assert.equal(validate.value({"validator": trueValidator}, 1), true);
+            assert.equal(validate.strict("true", true), true);
+            throwsErrorWith(() => validate.strict("true", 1),
+                "Expected true."
+            );
+        });
+        this.test("add multiple custom validators", function(){
+            validate.addValidators({
+                name: "hello",
+                validate: () => "hello",
+            }, {
+                name: "world",
+                validate: () => "world",
+            });
+            assert.equal(validate.value("hello", null), "hello");
+            assert.equal(validate.value("world", null), "world");
+        });
+        this.test("add a validator alias", function(){
+            validate.addValidatorAlias("trueAlias", "true");
+            assert.equal(validate.value("true", 1), true);
+            assert.equal(validate.value("trueAlias", 1), true);
+        });
+        this.test("remove a custom validator", function(){
+            validate.removeValidator("hello");
+            assert.equal(validate.value("true", true), true);
+            assert.equal(validate.value("world", null), "world");
+            throwsErrorWith(() => validate.value("hello", null),
+                `Unknown validator "hello".`
+            );
+        });
+        this.test("remove multiple custom validators", function(){
+            validate.removeValidators(trueValidator, "trueAlias", "world");
+            assert.equal(validate.value("number", 100), 100);
+            assert.equal(validate.value("string", "ok"), "ok");
+            throwsErrorWith(() => validate.value("true", null),
+                `Unknown validator "true".`
+            );
+            throwsErrorWith(() => validate.value("trueAlias", null),
+                `Unknown validator "trueAlias".`
+            );
+            throwsErrorWith(() => validate.value("hello", null),
+                `Unknown validator "hello".`
+            );
+            throwsErrorWith(() => validate.value("world", null),
+                `Unknown validator "world".`
+            );
+        });
+        this.test("attempt to add an invalid validator", function(){
+            throwsErrorWith(
+                () => validate.addValidator({validate: () => {}}),
+                `Options must include a "name" string.`
+            );
+            throwsErrorWith(
+                () => validate.addValidator({name: 12345, validate: () => {}}),
+                `Options must include a "name" string.`
+            );
+            throwsErrorWith(
+                () => validate.addValidator({name: "nope"}),
+                `Options must include a "validate" function.`
+            );
+            throwsErrorWith(
+                () => validate.addValidator({name: "nope", validate: "nope"}),
+                `Options must include a "validate" function.`
+            );
+            throwsErrorWith(() => validate.addValidator({
+                name: "hi", validate: () => {}, parameters: "nope"
+            }),
+                `Field \"parameters\" must be an object.`
+            );
+            throwsErrorWith(() => validate.addValidator({
+                name: "hi", validate: () => {}, describe: "nope"
+            }),
+                `Field \"describe\" must be a function.`
+            );
+            throwsErrorWith(() => validate.addValidator({
+                name: "hi", validate: () => {}, getDefaultValue: "nope"
+            }),
+                `Field \"getDefaultValue\" must be a function.`
+            );
+        });
+    });
+    
+    canary.group("invalid validators in specification", function(){
+        this.test("invalid name string", function(){
+            const spec = "NOT_A_TYPE";
+            throwsErrorWith(() => validate.strict(spec, null),
+                `Unknown validator "NOT_A_TYPE".`
+            );
+        });
+        this.test("invalid name in \"type\" attribute", function(){
+            const spec = {"type": "NOT_A_TYPE"};
+            throwsErrorWith(() => validate.strict(spec, null),
+                `Unknown validator "NOT_A_TYPE".`
+            );
+        });
+        this.test("invalid value in \"type\" attribute", function(){
+            const spec = {"type": 1234};
+            throwsErrorWith(() => validate.strict(spec, null),
+                "Unable to identify a validator in specification object."
+            );
+        });
+        this.test("no validator given", function(){
+            const spec = {"nullable": true};
+            throwsErrorWith(() => validate.strict(spec, null),
+                "Unable to identify a validator in specification object."
+            );
+        });
+        this.test("invalid custom validator", function(){
+            const customValidator = validate.addValidator({
+                name: "customValidator",
+                describe: () => {},
+                validate: () => {},
+            });
+            customValidator.validate = "not_a_function";
+            throwsErrorWith(() => validate.strict(customValidator, null),
+                `Invalid validator "customValidator".`
+            );
+            throwsErrorWith(() => validate.strict("customValidator", null),
+                `Invalid validator "customValidator".`
+            );
+            throwsErrorWith(() => validate.strict({"type": "customValidator"}, null),
+                `Invalid validator "customValidator".`
+            );
+            throwsErrorWith(() => validate.strict({"validator": customValidator}, null),
+                `Invalid validator "customValidator".`
+            );
+            validate.Validator.remove(customValidator);
+        });
+    });
+    
     canary.group("copy without sensitive attributes", function(){
         const oneSpec = {"type": "number", "sensitive": true};
         const listSpec = {
@@ -625,7 +779,14 @@ function makeTests(validate){
                 "sensitive": true,
             },
         };
-        const objSpec = {
+        const objAllSpec = {
+            "type": "object",
+            "attributes": {
+                "a": {"type": "boolean", "sensitive": true},
+                "b": {"type": "number", "sensitive": true},
+            },
+        };
+        const objSomeSpec = {
             "type": "object",
             "attributes": {
                 "sensitive": {"type": "boolean", "sensitive": true},
@@ -653,7 +814,7 @@ function makeTests(validate){
         this.test("single sensitive value", function(){
             assert.equal(validate.copyWithoutSensitive(oneSpec, 100), undefined);
         });
-        this.test("list", function(){
+        this.test("list with sensitive elements", function(){
             assert.equal(
                 validate.copyWithoutSensitive(listSpec, []), undefined
             );
@@ -661,8 +822,11 @@ function makeTests(validate){
                 validate.copyWithoutSensitive(listSpec, [1, 2, 3]), undefined
             );
         });
-        this.test("object", function(){
-            assert.deepEqual(validate.copyWithoutSensitive(objSpec, {
+        this.test("object with all sensitive attributes", function(){
+            assert.equal(validate.copyWithoutSensitive(objAllSpec, undefined));
+        });
+        this.test("object with some sensitive attributes", function(){
+            assert.deepEqual(validate.copyWithoutSensitive(objSomeSpec, {
                 "sensitive": true,
                 "insensitive": false,
             }), {
@@ -691,8 +855,11 @@ function makeTests(validate){
             ]);
         });
         this.test("attributes helper", function(){
+            assert.equal(validate.copyWithoutSensitiveAttributes(
+                objAllSpec["attributes"], {"a": true, "b": 1}
+            ), undefined);
             assert.deepEqual(validate.copyWithoutSensitiveAttributes(
-                objSpec["attributes"], {
+                objSomeSpec["attributes"], {
                     "sensitive": true,
                     "insensitive": false,
                 }

@@ -1,12 +1,15 @@
 const Validator = require("./validator");
-const ValidatorError = require("./validator-error");
+const ValueError = require("./value-error");
 const ValidationError = require("./validation-error");
 const ValidationPath = require("./validation-path");
 const getValidator = require("./get-validator");
 
 // Validate a single value of any type
 function validateValue(specification, value, path, strict){
-    if(!specification || typeof(specification) !== "object"){
+    if(!specification || (
+        typeof(specification) !== "string" &&
+        typeof(specification) !== "object"
+    )){
         throw new Error("Validation requires a specification object.");
     }
     const validator = getValidator(specification);
@@ -23,7 +26,7 @@ function validateValue(specification, value, path, strict){
     try{
         return validator.validate(specification, value, path, strict);
     }catch(error){
-        if(error instanceof ValidatorError){
+        if(error instanceof ValueError){
             const throwError = new ValidationError(
                 specification, value, path, strict,
                 validator, error && error.message
