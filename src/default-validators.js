@@ -150,8 +150,8 @@ function getDate(date){
 }
 
 // Value can be absolutely anything
-// Request: value is not changed or validated
-// Response: value is not changed or validated
+// Permissive: value is not changed or validated
+// Strict: value is not changed or validated
 const anyValidator = Validator.add({
     name: "any",
     defaultValue: undefined,
@@ -164,8 +164,8 @@ const anyValidator = Validator.add({
 });
 
 // Validator for boolean (true/false) values.
-// Request: value is converted to a boolean
-// Response: value is required to be a boolean
+// Permissive: value is converted to a boolean
+// Strict: value is required to be a boolean
 const booleanValidator = Validator.add({
     name: "boolean",
     defaultValue: false,
@@ -187,8 +187,8 @@ const booleanValidator = Validator.add({
 });
 
 // Validator for numbers. NaN and infinity are acceptable values.
-// Request: value is converted to a number and required to be in bounds
-// Response: value is required to be a number in bounds
+// Permissive: value is converted to a number and required to be in bounds
+// Strict: value is required to be a number in bounds
 // The "numeric" validator is distinct from the "number" validator in that
 // the numeric validator accepts NaN and infinite values whereas the number
 // validator does not.
@@ -226,9 +226,9 @@ const numericValidator = Validator.add({
 });
 
 // Validator for numbers. NaN and infinity are NOT acceptable values.
-// Request: value is converted to a number and required to be finite and
+// Permissive: value is converted to a number and required to be finite and
 // in bounds
-// Response: value is required to be a finite number in bounds
+// Strict: value is required to be a finite number in bounds
 // The "numeric" validator is distinct from the "number" validator in that
 // the numeric validator accepts NaN and infinite values whereas the number
 // validator does not.
@@ -250,9 +250,9 @@ const numberValidator = Validator.add({
 });
 
 // Validator for integer numbers.
-// Request: value is converted to a number and required to be integral and
+// Permissive: value is converted to a number and required to be integral and
 // in bounds
-// Response: value is required to be an integer in bounds
+// Strict: value is required to be an integer in bounds
 const integerValidator = Validator.add({
     name: "integer",
     defaultValue: 0,
@@ -272,9 +272,9 @@ const integerValidator = Validator.add({
 
 // Validator for indexes of sequences e.g. arrays. Values shall be integers
 // greater than or equal to zero.
-// Request: value is converted to a number and required to be integral, at least
+// Permissive: value is converted to a number and required to be integral, at least
 // zero, and in bounds
-// Response: value is required to be an integer at least zero and in bounds
+// Strict: value is required to be an integer at least zero and in bounds
 const indexValidator = Validator.add({
     name: "index",
     defaultValue: 0,
@@ -293,9 +293,9 @@ const indexValidator = Validator.add({
 });
 
 // Validator for strings
-// Request: value is converted to a string and required to be of an acceptable
+// Permissive: value is converted to a string and required to be of an acceptable
 // length
-// Response: value is required to be a string of acceptable length
+// Strict: value is required to be a string of acceptable length
 const stringValidator = Validator.add({
     name: "string",
     defaultValue: "",
@@ -337,9 +337,9 @@ const stringValidator = Validator.add({
 });
 
 // Validator for email addresses
-// Request: value is coverted to a string and required to look like an
+// Permissive: value is coverted to a string and required to look like an
 // email address
-// Response: value is required to be a string that resembles an email address
+// Strict: value is required to be a string that resembles an email address
 const emailAddressValidator = Validator.add({
     name: "email",
     defaultValue: "",
@@ -359,10 +359,10 @@ const emailAddressValidator = Validator.add({
 });
 
 // Validator for timestamps
-// Request: value is converted to a Date object and required to be within
+// Permissive: value is converted to a Date object and required to be within
 // acceptable bounds. Dates can be converted from unix timestamps (milliseconds
 // since UTC epoch) or ISO format date strings
-// Response: value is converted to a Date object and required to be within
+// Strict: value is converted to a Date object and required to be within
 // acceptable bounds. Dates can be converted from unix timestamps, ISO date
 // strings, moment date objects, luxon date objects, and dayjs date objects.
 const timestampValidator = Validator.add({
@@ -406,6 +406,15 @@ const timestampValidator = Validator.add({
     },
 });
 
+// Validator for enumerations
+// Permissive: value is checked for equality with each member of the "values"
+// array, and when an equivalent value is found, the value from the enumeration
+// is returned. Equality is true when input === enumValue, +input === enumValue,
+// or String(input) === enumValue, or when input and enumValue are both NaN.
+// Strict: value is checked for equality with each member of the "values"
+// array, and when an equivalent value is found, the value from the enumeration
+// is returned. Equality is true when input === enumValue or when input and
+// enumValue are both NaN.
 const enumValidator = Validator.add({
     name: "enum",
     parameters: {
@@ -447,10 +456,10 @@ const enumValidator = Validator.add({
 });
 
 // Validator for lists
-// Request: value is required to be some iterable of acceptable length, with
+// Permissive: value is required to be some iterable of acceptable length, with
 // every element satisfying the "each" specification if it was provided.
 // The iterable is converted to an array
-// Response: value is required to be some iterable of acceptable length, with
+// Strict: value is required to be some iterable of acceptable length, with
 // every element satisfying the "each" specification if it was provided.
 // The iterable is converted to an array
 const listValidator = Validator.add({
@@ -481,9 +490,9 @@ const listValidator = Validator.add({
 });
 
 // Validator for objects
-// Request: value is required to be an object having attributes whose values
+// Permissive: value is required to be an object having attributes whose values
 // satisfy the associated validator specifications
-// Response: value is required to be an object having attributes whose values
+// Strict: value is required to be an object having attributes whose values
 // satisfy the associated validator specifications
 const objectValidator = Validator.add({
     name: "object",
