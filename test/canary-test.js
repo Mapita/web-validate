@@ -638,25 +638,6 @@ function makeTests(validate){
         );
     });
     
-    canary.group("attributes validation helper", function(){
-        const attrSpec = {
-            "number": {"type": "number"},
-            "string": {"type": "string"},
-        };
-        const obj1 = {"number": 1, "string": "ok"};
-        const obj2 = {"number": "1", "string": "ok"};
-        this.test("normal", function(){
-            assert.deepEqual(validate.attributes(attrSpec, obj1), obj1);
-            assert.deepEqual(validate.attributes(attrSpec, obj2), obj1);
-        });
-        this.test("strict", function(){
-            assert.deepEqual(validate.strictAttributes(attrSpec, obj1), obj1);
-            throwsErrorWith(() => validate.strictAttributes(attrSpec, obj2),
-                `Expected a finite number at object.number: Value isn't numeric.`
-            );
-        });
-    });
-    
     canary.series("custom validators", function(){
         let trueValidator;
         this.test("add a custom validator", function(){
@@ -886,19 +867,6 @@ function makeTests(validate){
                     "insensitiveNumber": 3,
                 },
             ]);
-        });
-        this.test("attributes helper", function(){
-            assert.equal(validate.copyWithoutSensitiveAttributes(
-                objAllSpec["attributes"], {"a": true, "b": 1}
-            ), undefined);
-            assert.deepEqual(validate.copyWithoutSensitiveAttributes(
-                objSomeSpec["attributes"], {
-                    "sensitive": true,
-                    "insensitive": false,
-                }
-            ), {
-                "insensitive": false,
-            });
         });
     });
     
