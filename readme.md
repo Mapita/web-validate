@@ -25,6 +25,7 @@ web-friendly documentation for these wrapped endpoints.
     - [Importing web-validate](#importing-web-validate)
     - [Strict vs. permissive validation](#strict-vs-permissive-validation)
     - [Example code](#example-code)
+    - [Example validation failure](#example-validation-failure)
 - [Specification properties](#specification-properties)
     - [type](#type)
     - [validator](#validator)
@@ -129,6 +130,60 @@ const z = validate.strict(specification, 0.5);
 // Throws a validate.Error instance:
 // "Expected a finite number that is at least 0 and at most 1: Value isn't numeric."
 const NOPE = validate.strict(specification, "0.5");
+```
+
+### Example validation failure
+
+The errors thrown by calls to `validate.value` and `validate.strict` are
+highly descriptive and based on the assumption that, usually, the person
+seeing these error message is somebody who's trying to figure out how
+to use your API. In that case, it helps to know exactly where the problem
+is and how to fix it.
+
+``` js
+const specification = {
+    "type": "object",
+    "attributes": {
+        "identity": {
+            "type": "object",
+            "attributes": {
+                "firstName": "string",
+                "lastName": "string",
+                "emailAddress": {"type": "email", "optional": true}
+            }
+        },
+        "connections": {
+            "type": "list",
+            "each": {
+                "type": "object",
+                "attributes": {
+                    "firstName": "string",
+                    "lastName": "string"
+                }
+            }
+        }
+    }
+};
+
+// ValidationError: Expected an object with mandatory keys
+// "firstName" and "lastName" at object.connections[1]:
+// Missing required attribute "lastName".
+validate.value(specification, {
+    "identity": {
+        "firstName": "Sophie",
+        "lastName": "Kirschner"
+    },
+    "connections": [
+        {
+            "firstName": "Gordon",
+            "lastName": "Freeman"
+        },
+        {
+            "firstName": "Chell"
+        }
+    ]
+});
+
 ```
 
 ## Specification properties
