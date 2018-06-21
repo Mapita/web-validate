@@ -29,7 +29,7 @@ function validateObject(specification, object, path, strict){
         const attrSpec = specification.attributes[key];
         if(!object.hasOwnProperty(key)){
             const attrValidator = getValidator(attrSpec);
-            if(!attrSpec.optional){
+            if(!attrSpec.optional && !("default" in attrSpec)){
                 throw new ValueError(`Missing required attribute "${key}".`);
             }else if("default" in attrSpec){
                 validatedObject[key] = attrSpec.default;

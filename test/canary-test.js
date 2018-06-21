@@ -559,6 +559,9 @@ function makeTests(validate){
             "explicitDefault": {
                 "type": "number", "optional": true, "default": 100
             },
+            "explicitDefaultNoOptional": {
+                "type": "number", "default": 200
+            },
             "nullableDefault": {
                 "type": "number", "optional": true, "nullable": true
             },
@@ -568,12 +571,14 @@ function makeTests(validate){
             const all = {
                 "implicitDefault": 10,
                 "explicitDefault": 20,
-                "nullableDefault": 30,
+                "explicitDefaultNoOptional": 30,
+                "nullableDefault": 40,
             };
             assert.deepEqual(validate.value(optSpec, all), all);
             assert.deepEqual(validate.value(optSpec, none), {
                 "implicitDefault": 0,
                 "explicitDefault": 100,
+                "explicitDefaultNoOptional": 200,
                 "nullableDefault": null,
             });
         });
