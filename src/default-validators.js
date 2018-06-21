@@ -410,9 +410,9 @@ const timestampValidator = Validator.add({
         const minDate = tryGetDate(specification.minDate);
         const maxDate = tryGetDate(specification.maxDate);
         if(minDate && date < minDate.getTime()){
-            throw new ValueError("Date is before the minimum date.");
+            throw new ValueError("Timestamp is before the minimum date.");
         }else if(maxDate && date > maxDate.getTime()){
-            throw new ValueError("Date is after the maximum date.");
+            throw new ValueError("Timestamp is after the maximum date.");
         }
         return date;
     },

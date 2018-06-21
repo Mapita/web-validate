@@ -303,14 +303,14 @@ function makeTests(validate){
                 new Date("2018-01-01T00:00:00Z")
             );
             throwsErrorWith(() => validate.strict(minSpec, "2000-01-01T00:00:00Z"),
-                "Date is before the minimum date"
+                "Timestamp is before the minimum date"
             );
             const maxSpec = {"type": "timestamp", "maxDate": "2020-01-01"};
             assert.deepEqual(validate.strict(maxSpec, "2018-01-01T00:00:00Z"),
                 new Date("2018-01-01T00:00:00Z")
             );
             throwsErrorWith(() => validate.strict(maxSpec, "2040-01-01T00:00:00Z"),
-                "Date is after the maximum date"
+                "Timestamp is after the maximum date"
             );
             const bothSpec = {"type": "timestamp",
                 "minDate": "2010-01-01", "maxDate": "2020-01-01"
@@ -319,10 +319,10 @@ function makeTests(validate){
                 new Date("2018-01-01T00:00:00Z")
             );
             throwsErrorWith(() => validate.strict(bothSpec, "2000-01-01T00:00:00Z"),
-                "Date is before the minimum date"
+                "Timestamp is before the minimum date"
             );
             throwsErrorWith(() => validate.strict(bothSpec, "2040-01-01T00:00:00Z"),
-                "Date is after the maximum date"
+                "Timestamp is after the maximum date"
             );
         });
         this.test("dayjs date input", function(){
