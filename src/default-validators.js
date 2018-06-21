@@ -409,7 +409,7 @@ const timestampValidator = Validator.add({
 const enumValidator = Validator.add({
     name: "enum",
     parameters: {
-        "values": "Describes a list of acceptable values.",
+        "values": "An array of acceptable values.",
     },
     describe: function(specification){
         const values = specification && specification.values;
