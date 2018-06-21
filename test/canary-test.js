@@ -1,9 +1,12 @@
 const assert = require("assert").strict;
 
+// These dependencies are used to test the timestamp validator
 const dayjs = require("dayjs");
 const luxon = require("luxon");
 const moment = require("moment");
 
+// Helper asserts that the callback throws an error whose message
+// contains the given substring
 function throwsErrorWith(callback, string){
     try{
         try{
@@ -28,6 +31,7 @@ function throwsErrorWith(callback, string){
     }
 }
 
+// Helper asserts that a value is numeric NaN
 function assertIsNaN(value){
     assert(value !== value, `Value ${value} isn't NaN.`);
 }
