@@ -26,20 +26,22 @@ function validateObject(specification, object, path, strict){
     const validatedObject = {};
     // Handle missing attributes
     for(let key in specification.attributes){
-        const attrSpec = specification.attributes[key];
-        if(!object.hasOwnProperty(key)){
-            const attrValidator = Validator.get(attrSpec);
-            if(!attrSpec.optional && !("default" in attrSpec)){
-                throw new ValueError(`Missing required attribute "${key}".`);
-            }else if("default" in attrSpec){
-                validatedObject[key] = attrSpec.default;
-            }else if(attrSpec.nullable){
-                validatedObject[key] = null;
-            }else if(attrValidator.getDefaultValue instanceof Function){
-                validatedObject[key] = attrValidator.getDefaultValue(attrSpec);
-            }else{
-                validatedObject[key] = attrValidator.defaultValue;
-            }
+        if(object.hasOwnProperty(key)) continue;
+        const attrSpecRaw = specification.attributes[key];
+        const attrValidator = Validator.get(attrSpecRaw);
+        const attrSpec = (typeof(attrSpecRaw) === "string" ?
+            {"type": attrSpecRaw} : attrSpecRaw
+        );
+        if(!attrSpec.optional && !("default" in attrSpec)){
+            throw new ValueError(`Missing required attribute "${key}".`);
+        }else if("default" in attrSpec){
+            validatedObject[key] = attrSpec.default;
+        }else if(attrSpec.nullable){
+            validatedObject[key] = null;
+        }else if(attrValidator.getDefaultValue instanceof Function){
+            validatedObject[key] = attrValidator.getDefaultValue(attrSpec);
+        }else{
+            validatedObject[key] = attrValidator.defaultValue;
         }
     }
     // Validate present attributes
