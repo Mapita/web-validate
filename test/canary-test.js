@@ -257,6 +257,21 @@ function makeTests(validate){
                 "Expected a string and matching the regular expression /test2+/: String doesn't match the regular expression."
             );
         });
+        this.test("coercion of inputs to strings", function(){
+            assert.equal(validate.value(spec, null), "");
+            assert.equal(validate.value(spec, undefined), "");
+            assert.equal(validate.value(spec, true), "true");
+            assert.equal(validate.value(spec, false), "false");
+            assert.equal(validate.value(spec, 1), "1");
+            assert.equal(validate.value(spec, Infinity), "Infinity");
+            assert.equal(validate.value(spec, NaN), "NaN");
+            assert.throws(() => validate.value(spec, []));
+            assert.throws(() => validate.value(spec, {}));
+            assert.throws(() => validate.struct(spec, null));
+            assert.throws(() => validate.struct(spec, undefined));
+            assert.throws(() => validate.struct(spec, true));
+            assert.throws(() => validate.struct(spec, 1));
+        });
     });
     
     canary.group("email address validator", function(){

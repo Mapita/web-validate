@@ -327,12 +327,19 @@ const stringValidator = Validator.add({
         else return base;
     },
     validate: function(specification, value, path, strict){
-        if(strict && typeof(value) !== "string"){
+        if(strict){
+            // Do nothing
+        }else if(value === null || value === undefined){
+            value = "";
+        }else if(typeof(value) === "boolean"){
+            value = value ? "true" : "false";
+        }else if(typeof(value) === "number"){
+            value = String(value);
+        }
+        if(typeof(value) !== "string"){
             throw new ValueError("Value isn't a string.");
         }
-        value = validateListLength("String", specification, (
-            value === null || value === undefined ? "" : String(value)
-        ));
+        value = validateListLength("String", specification, value);
         if(specification.pattern){
             const match = value.match(specification.pattern);
             if(!match || !match[0] || match[0].length !== value.length){
