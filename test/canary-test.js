@@ -458,9 +458,15 @@ function makeTests(validate){
                 "List is too long"
             );
         });
-        this.test("invalid \"each\" specification", function(){
+        this.test("each as validator name", function(){
+            const eachSpec = {"type": "list", "each": "number"};
+            assert.deepEqual(validate.value(eachSpec, ["1", "2"]), [1, 2]);
+        });
+        this.test("invalid each specification", function(){
             const badSpec = {"type": "list", "each": "not a validator"};
-            assert.throws(() => validate.strict(badSpec, []), Error);
+            throwsErrorWith(() => validate.strict(badSpec, []),
+                `Unknown validator "not a validator".`
+            );
         });
     });
     
@@ -542,7 +548,16 @@ function makeTests(validate){
                 "nullableDefault": null,
             });
         });
-        this.test("invalid \"attributes\" specification", function(){
+        this.test("attribute as validator name", function(){
+            const attrSpec = {"type": "object", "attributes": {
+                "number": "number", "string": "string",
+            }};
+            assert.deepEqual(
+                validate.value(attrSpec, {"number": "1", "string": 2}),
+                {"number": 1, "string": "2"}
+            );
+        });
+        this.test("invalid attributes specification", function(){
             const badSpec = {"type": "object", "attributes": "nope"};
             assert.throws(() => validate.strict(badSpec, {}), Error);
         });
@@ -601,7 +616,8 @@ function makeTests(validate){
             ],
         };
         throwsErrorWith(() => validate.value(spec, failObj),
-            `Expected a finite number at object.list[1].number: Value isn't numeric.`
+            `Expected a finite number at object.list[1].number: ` +
+            `Value isn't numeric.`
         );
     });
     
