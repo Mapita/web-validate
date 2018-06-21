@@ -521,11 +521,13 @@ function makeTests(validate){
         }};
         const obj1 = {"boolean": false, "number": 1};
         const obj2 = {"boolean": "false", "number": 1};
-        const obj3 = {"boolean": false, "number": "nope"};
+        const obj3 = {"boolean": false, "number": 1, "extra": "hi"};
+        const obj4 = {"boolean": false, "number": "nope"};
         this.test("attributes normal", function(){
             assert.deepEqual(validate.value(attrSpec, obj1), obj1);
             assert.deepEqual(validate.value(attrSpec, obj2), obj1);
-            throwsErrorWith(() => validate.value(attrSpec, obj3),
+            assert.deepEqual(validate.value(attrSpec, obj3), obj1);
+            throwsErrorWith(() => validate.value(attrSpec, obj4),
                 `Expected a finite number at object.number: Value isn't numeric.`
             );
         });
@@ -535,6 +537,9 @@ function makeTests(validate){
                 `Expected a boolean at object.boolean: Value isn't a boolean.`
             );
             throwsErrorWith(() => validate.strict(attrSpec, obj3),
+                `Unexpected attribute "extra"`
+            );
+            throwsErrorWith(() => validate.strict(attrSpec, obj4),
                 `Expected a finite number at object.number: Value isn't numeric.`
             );
         });

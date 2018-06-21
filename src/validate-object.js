@@ -52,7 +52,7 @@ function validateObject(specification, object, path, strict){
                 attrSpec, object[key], nextPath, strict
             );
         }else if(strict){
-            throw new ValueError(`Extra attribute "${key}".`);
+            throw new ValueError(`Unexpected attribute "${key}".`);
         }
     }
     // All done, return the output object
