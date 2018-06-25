@@ -427,7 +427,10 @@ When used strictly, the input is required to already be a string.
 The validator recognizes `minLength` and `maxLength` parameters in the
 specification object. These are inclusive bounds enforced for all input
 strings; an error is produced when the length of an input string
-is not within these bounds.
+is not within these bounds. It also recognizes a `length` parameter that
+describes a mandatory exact length.
+Note that string length is measured by the number of unicode
+[code points](https://stackoverflow.com/a/27331885/4099022).
 
 The validator also recognizes a `pattern` parameter.
 The pattern may be either a
@@ -513,6 +516,9 @@ it is not recommended to ever set `maxLength` to `Infinity`, though
 this is possible in case you can guarantee that inputs will always be
 of a finite length.
 
+The `length` parameter can be used to specify an exact length that the
+list must be.
+
 The validator also recognizes an `each` parameter, which should itself be
 a specification object. The list validator will output a list produced
 by applying that specification to validate each element of the input.
@@ -544,6 +550,10 @@ object that are not included in the `attributes` object are excluded
 from the output object.
 When validating strictly, any attributes of the input object that are
 not included in the `attributes` object produce an error.
+However, this behavior can be changed using the `keepUnlistedAttributes`
+parameter. In this case, attributes not included in the `attributes`
+object are inserted unchanged into the output object for both permissive
+and strict validation, without producing any errors.
 
 Note that the attribute specifications for an object acquire new
 meaningful specification object properties: `optional` and `default`.
