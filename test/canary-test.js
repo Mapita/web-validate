@@ -641,6 +641,35 @@ function makeTests(validate){
                 "nullableDefault": null,
             });
         });
+        this.test("refuse unlisted attributes by default", function(){
+            const attrSpec = {
+                "type": "object",
+                "attributes": {"number": "number"},
+            };
+            const obj = {"number": 1, "x": true};
+            assert.deepEqual(validate.value(attrSpec, obj), {"number": 1});
+            throwsErrorWith(() => validate.strict(attrSpec, obj),
+                `Expected an object with a mandatory key "number": ` +
+                `Unexpected attribute "x".`
+            );
+        });
+        this.test("keep unlisted attributes when so specified", function(){
+            const attrSpec = {
+                "type": "object",
+                "keepUnlistedAttributes": true,
+                "attributes": {"number": "number"},
+            };
+            assert.deepEqual(validate.value(attrSpec, {
+                "number": "1", "boolean": true
+            }), {
+                "number": 1, "boolean": true
+            });
+            assert.deepEqual(validate.strict(attrSpec, {
+                "number": 1, "boolean": true
+            }), {
+                "number": 1, "boolean": true
+            });
+        });
         this.test("attribute as validator name", function(){
             const attrSpec = {"type": "object", "attributes": {
                 "number": "number", "string": "string",
@@ -831,50 +860,18 @@ function makeTests(validate){
     });
     
     canary.group("copy without sensitive attributes", function(){
-        const oneSpec = {"type": "number", "sensitive": true};
-        const listSpec = {
-            "type": "list",
-            "each": {
-                "type": "number",
-                "sensitive": true,
-            },
-        };
-        const objAllSpec = {
-            "type": "object",
-            "attributes": {
-                "a": {"type": "boolean", "sensitive": true},
-                "b": {"type": "number", "sensitive": true},
-            },
-        };
-        const objSomeSpec = {
-            "type": "object",
-            "attributes": {
-                "sensitive": {"type": "boolean", "sensitive": true},
-                "insensitive": {"type": "boolean"},
-            },
-        };
-        const complexSpec = {
-            "type": "list",
-            "each": {
-                "type": "object",
-                "attributes": {
-                    "insensitiveNumber": {"type": "number"},
-                    "sensitiveNumber": {
-                        "type": "number",
-                        "sensitive": true,
-                    },
-                    "list": {
-                        "type": "list",
-                        "sensitive": true,
-                        "each": {"type": "number"},
-                    },
-                },
-            },
-        };
         this.test("single sensitive value", function(){
+            const oneSpec = {"type": "number", "sensitive": true};
             assert.equal(validate.copyWithoutSensitive(oneSpec, 100), undefined);
         });
         this.test("list with sensitive elements", function(){
+            const listSpec = {
+                "type": "list",
+                "each": {
+                    "type": "number",
+                    "sensitive": true,
+                },
+            };
             assert.equal(
                 validate.copyWithoutSensitive(listSpec, []), undefined
             );
@@ -883,14 +880,45 @@ function makeTests(validate){
             );
         });
         this.test("object with all sensitive attributes", function(){
+            const objAllSpec = {
+                "type": "object",
+                "attributes": {
+                    "a": {"type": "boolean", "sensitive": true},
+                    "b": {"type": "number", "sensitive": true},
+                },
+            };
             assert.equal(validate.copyWithoutSensitive(objAllSpec, undefined));
         });
         this.test("object with some sensitive attributes", function(){
+            const objSomeSpec = {
+                "type": "object",
+                "attributes": {
+                    "sensitive": {"type": "boolean", "sensitive": true},
+                    "insensitive": {"type": "boolean"},
+                },
+            };
             assert.deepEqual(validate.copyWithoutSensitive(objSomeSpec, {
                 "sensitive": true,
                 "insensitive": false,
             }), {
                 "insensitive": false,
+            });
+        });
+        this.test("include attributes not in the specification", function(){
+            const objSomeSpec = {
+                "type": "object",
+                "attributes": {
+                    "sensitive": {"type": "boolean", "sensitive": true},
+                    "insensitive": {"type": "boolean"},
+                },
+            };
+            assert.deepEqual(validate.copyWithoutSensitive(objSomeSpec, {
+                "sensitive": true,
+                "insensitive": false,
+                "unlisted": "hello",
+            }), {
+                "insensitive": false,
+                "unlisted": "hello",
             });
         });
         this.test("copy nullable list", function(){
@@ -922,6 +950,24 @@ function makeTests(validate){
             );
         });
         this.test("nested objects and lists", function(){
+            const complexSpec = {
+                "type": "list",
+                "each": {
+                    "type": "object",
+                    "attributes": {
+                        "insensitiveNumber": {"type": "number"},
+                        "sensitiveNumber": {
+                            "type": "number",
+                            "sensitive": true,
+                        },
+                        "list": {
+                            "type": "list",
+                            "sensitive": true,
+                            "each": {"type": "number"},
+                        },
+                    },
+                },
+            };
             assert.deepEqual(validate.copyWithoutSensitive(complexSpec, [
                 {
                     "insensitiveNumber": 1,
@@ -934,12 +980,8 @@ function makeTests(validate){
                     "list": [1, 2, 3],
                 },
             ]), [
-                {
-                    "insensitiveNumber": 1,
-                },
-                {
-                    "insensitiveNumber": 3,
-                },
+                {"insensitiveNumber": 1},
+                {"insensitiveNumber": 3},
             ]);
         });
     });
