@@ -1,3 +1,9 @@
+# v0.1.3
+
+Fourth release. 24 June 2018.
+
+- Remove log lines used to debug previous release. (d'oh)
+
 # v0.1.2
 
 Third release. 24 June 2018.
