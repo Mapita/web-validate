@@ -529,8 +529,6 @@ const objectValidator = Validator.add({
         return validateObject(specification, value, path, strict);
     },
     copyWithoutSensitive: function(specification, value){
-        console.log("spec: ", specification);
-        console.log("value: ", value);
         if(specification.sensitive){
             return undefined;
         }else if(!value){ // For nullable objects
