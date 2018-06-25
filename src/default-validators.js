@@ -30,11 +30,11 @@ function describeListValidator(name, elements, specification){
     const min = +specification.minimum;
     const max = +specification.maximum;
     if(Number.isFinite(min) && Number.isFinite(max)){
-        return `${name} that with at least ${min} and at most ${max} ${elements}`;
+        return `${name} with at least ${min} and at most ${max} ${elements}`;
     }else if(Number.isFinite(min)){
-        return `${name} that with at least ${min} ${elements}`;
+        return `${name} with at least ${min} ${elements}`;
     }else if(Number.isFinite(max)){
-        return `${name} that with at most ${max} ${elements}`;
+        return `${name} with at most ${max} ${elements}`;
     }else{
         return `${name}`;
     }
