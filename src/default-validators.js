@@ -27,9 +27,12 @@ function describeNumberValidator(name, specification){
 
 // Helpers for list and string validators
 function describeListValidator(name, elements, specification){
+    const exact = +specification.length;
     const min = +specification.minimum;
     const max = +specification.maximum;
-    if(Number.isFinite(min) && Number.isFinite(max)){
+    if(Number.isFinite(exact)){
+        return `${name} with exactly ${exact} ${elements}`;
+    }else if(Number.isFinite(min) && Number.isFinite(max)){
         return `${name} with at least ${min} and at most ${max} ${elements}`;
     }else if(Number.isFinite(min)){
         return `${name} with at least ${min} ${elements}`;
@@ -40,14 +43,28 @@ function describeListValidator(name, elements, specification){
     }
 }
 function validateListLength(name, specification, list){
+    const exact = +specification.length;
     const min = +specification.minLength;
     const max = +specification.maxLength;
-    if(Number.isFinite(min) && list.length < min){
+    // Compare code point length of strings instead of UTF-16 code unit length
+    const valueLength = Array.from(list).length;
+    // Check against exact length (if specified)
+    if(Number.isFinite(exact)){
+        if(Number.isFinite(min) || Number.isFinite(max)) throw new Error(
+            `Cannot have both "length" and "minLength"/"maxLength" ` +
+            `parameters in ${name.toLowerCase()} specification.`
+        );
+        if(valueLength < exact) throw new ValueError(`${name} is too short.`);
+        if(valueLength > exact) throw new ValueError(`${name} is too long.`);
+    }
+    // Check against min/max length (if specified)
+    if(Number.isFinite(min) && valueLength < min){
         throw new ValueError(`${name} is too short.`);
     }
-    if(Number.isFinite(max) && list.length > max){
+    if(Number.isFinite(max) && valueLength > max){
         throw new ValueError(`${name} is too long.`);
     }
+    // Return the validated value
     return list;
 }
 
@@ -312,6 +329,7 @@ const stringValidator = Validator.add({
     name: "string",
     defaultValue: "",
     parameters: {
+        "length": "The list must contain exactly this many characters.",
         "minLength": "The string must contain at least this many characters.",
         "maxLength": "The string must not contain more characters than this.",
         "pattern": "A regular expression that the string must fully match.",
@@ -486,6 +504,7 @@ const listValidator = Validator.add({
     defaultPath: "list",
     getDefaultValue: () => [],
     parameters: {
+        "length": "The list must contain exactly this many elements.",
         "minLength": "The list must contain at least this many elements.",
         "maxLength": "The list must not contain more elements than this.",
         "each": "Describes a validator for each element in the list.",
@@ -494,7 +513,8 @@ const listValidator = Validator.add({
         return describeListValidator("a list", "elements", specification);
     },
     validate: function(specification, value, path, strict){
-        return validateList(specification, value, path, strict);
+        value = validateList(specification, value, path, strict);
+        return validateListLength("List", specification, value);
     },
     copyWithoutSensitive: function(specification, value){
         if(specification.sensitive || (

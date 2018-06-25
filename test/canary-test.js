@@ -234,6 +234,15 @@ function makeTests(validate){
             throwsErrorWith(() => validate.strict(spec, 123), "Value isn't a string");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't a string");
         });
+        this.test("exact length", function(){
+            const lenSpec = {"type": "string", "length": 4};
+            assert.equal(validate.strict(lenSpec, "test"), "test");
+            // Below assertion will fail if length is counted by UTF-16 code
+            // units, instead of by code points as it is intended to be.
+            assert.equal(validate.strict(lenSpec, "😄😄😄😄"), "😄😄😄😄");
+            throwsErrorWith(() => validate.strict(lenSpec, ""), "String is too short");
+            throwsErrorWith(() => validate.strict(lenSpec, "12345"), "String is too long");
+        });
         this.test("length bounds", function(){
             const boundSpec = {"type": "string", "minLength": 5, "maxLength": 6};
             assert.equal(validate.strict(boundSpec, "right"), "right");
@@ -271,6 +280,18 @@ function makeTests(validate){
             assert.throws(() => validate.struct(spec, undefined));
             assert.throws(() => validate.struct(spec, true));
             assert.throws(() => validate.struct(spec, 1));
+        });
+        this.test("exact length and min/max length improperly combined", function(){
+            const badSpec1 = {"type": "string", "length": 4, "minLength": 3};
+            const badSpec2 = {"type": "string", "length": 4, "maxLength": 5};
+            throwsErrorWith(() => validate.strict(badSpec1, ""),
+                `Cannot have both "length" and "minLength"/"maxLength" ` +
+                `parameters in string specification.`
+            );
+            throwsErrorWith(() => validate.strict(badSpec2, ""),
+                `Cannot have both "length" and "minLength"/"maxLength" ` +
+                `parameters in string specification.`
+            );
         });
     });
     
@@ -475,6 +496,12 @@ function makeTests(validate){
                "Expected a finite number at list[1]: Value isn't numeric."
            ); 
         });
+        this.test("exact length", function(){
+            const lenSpec = {"type": "list", "length": 2};
+            assert.deepEqual(validate.strict(lenSpec, [1, 2]), [1, 2]);
+            throwsErrorWith(() => validate.strict(lenSpec, []), "List is too short");
+            throwsErrorWith(() => validate.strict(lenSpec, [1, 2, 3]), "List is too long");
+        });
         this.test("length bounds", function(){
             const boundSpec = {"type": "list", "minLength": 2, "maxLength": 4};
             assert.deepEqual(validate.strict(boundSpec, [1, 2]), [1, 2]);
@@ -510,6 +537,18 @@ function makeTests(validate){
                 {"type": "list", "maxLength": Infinity}, iter()
             ),
                 "Iterator never terminated."
+            );
+        });
+        this.test("exact length and min/max length improperly combined", function(){
+            const badSpec1 = {"type": "list", "length": 4, "minLength": 3};
+            const badSpec2 = {"type": "list", "length": 4, "maxLength": 5};
+            throwsErrorWith(() => validate.strict(badSpec1, []),
+                `Cannot have both "length" and "minLength"/"maxLength" ` +
+                `parameters in list specification.`
+            );
+            throwsErrorWith(() => validate.strict(badSpec2, []),
+                `Cannot have both "length" and "minLength"/"maxLength" ` +
+                `parameters in list specification.`
             );
         });
     });

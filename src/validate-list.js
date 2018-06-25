@@ -37,12 +37,6 @@ function validateList(specification, list, path, strict){
             throw new ValueError("List is too long.");
         }
     }
-    // Make sure the list is long enough
-    if(Number.isFinite(+specification.minLength) &&
-        validatedArray.length < +specification.minLength
-    ){
-        throw new ValueError("List is too short.");
-    }
     // All done, return the result
     return validatedArray;
 }
