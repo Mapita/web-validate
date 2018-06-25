@@ -47,10 +47,10 @@ function validateObject(specification, object, path, strict){
     // Validate present attributes
     for(let key in object){
         if(!object.hasOwnProperty(key)) continue;
-        if(specification.attributes[key]){
+        if(specification.attributes[key] || specification.keepUnlistedAttributes){
             const attrSpec = specification.attributes[key];
             const nextPath = path.getNextPath(key);
-            validatedObject[key] = validateValue(
+            validatedObject[key] = !attrSpec ? object[key] : validateValue(
                 attrSpec, object[key], nextPath, strict
             );
         }else if(strict){

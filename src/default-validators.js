@@ -541,6 +541,10 @@ const objectValidator = Validator.add({
     getDefaultValue: () => {},
     parameters: {
         "attributes": "Describes a validator per attribute of the object.",
+        "keepUnlistedAttributes": (
+            "A boolean which, when true, causes keys not listed in the " +
+            "attributes parameter to be retained in the output object."
+        ),
     },
     describe: function(specification){
         return describeObjectValidator(specification);
@@ -560,12 +564,16 @@ const objectValidator = Validator.add({
         }
         const object = {};
         let anyInsensitive = false;
-        for(let key in specification.attributes){
-            if(!specification.attributes[key].sensitive){
+        for(let key in value){
+            if(key in specification.attributes){
+                if(specification.attributes[key].sensitive) continue;
                 anyInsensitive = true;
                 object[key] = copyWithoutSensitive(
                     specification.attributes[key], value[key]
                 );
+            }else{
+                anyInsensitive = true;
+                object[key] = value[key];
             }
         }
         return anyInsensitive ? object : undefined;
