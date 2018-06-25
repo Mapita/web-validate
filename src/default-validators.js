@@ -501,6 +501,8 @@ const listValidator = Validator.add({
             specification.each && specification.each.sensitive
         )){
             return undefined;
+        }else if(!value || !specification.each){
+            return value;
         }
         return Array.prototype.map.call(value,
             element => copyWithoutSensitive(specification.each, element)
@@ -527,10 +529,16 @@ const objectValidator = Validator.add({
         return validateObject(specification, value, path, strict);
     },
     copyWithoutSensitive: function(specification, value){
-        if(specification.sensitive || !specification.attributes ||
+        console.log("spec: ", specification);
+        console.log("value: ", value);
+        if(specification.sensitive){
+            return undefined;
+        }else if(!value){ // For nullable objects
+            return value;
+        }else if(!specification.attributes ||
             typeof(specification.attributes) !== "object"
         ){
-            return undefined;
+            return value;
         }
         const object = {};
         let anyInsensitive = false;

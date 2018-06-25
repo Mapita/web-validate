@@ -854,6 +854,34 @@ function makeTests(validate){
                 "insensitive": false,
             });
         });
+        this.test("copy nullable list", function(){
+            const nullableListSpec = {
+                "type": "list", "nullable": true
+            };
+            assert.deepEqual(
+                validate.copyWithoutSensitive(nullableListSpec, []), []
+            );
+            assert.deepEqual(
+                validate.copyWithoutSensitive(nullableListSpec, [1, 2]), [1, 2]
+            );
+            assert.equal(
+                validate.copyWithoutSensitive(nullableListSpec, null), null
+            );
+        });
+        this.test("copy nullable object", function(){
+            const nullableObjSpec = {
+                "type": "object", "nullable": true
+            };
+            assert.deepEqual(
+                validate.copyWithoutSensitive(nullableObjSpec, {}), {}
+            );
+            assert.deepEqual(
+                validate.copyWithoutSensitive(nullableObjSpec, {a: 1}), {a: 1}
+            );
+            assert.equal(
+                validate.copyWithoutSensitive(nullableObjSpec, null), null
+            );
+        });
         this.test("nested objects and lists", function(){
             assert.deepEqual(validate.copyWithoutSensitive(complexSpec, [
                 {
