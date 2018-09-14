@@ -1,3 +1,10 @@
+# v0.2.0
+
+Fifth release. 14 September 2018.
+
+- "email" default validator no longer converts to lowercase
+- "email" validator now trims whitespace from the input when set to permissive
+
 # v0.1.3
 
 Fourth release. 24 June 2018.
