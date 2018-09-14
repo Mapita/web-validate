@@ -306,7 +306,7 @@ function makeTests(validate){
         this.test("strict", function(){
             assert.equal(validate.strict(spec, "test@test.com"), "test@test.com");
             assert.equal(validate.strict(spec, "TEST@Test.com"), "TEST@Test.com");
-            assert.equal(validate.strict(spec, " TEST@Test.com "), "TEST@Test.com");
+            assert.equal(validate.strict(spec, " TEST@Test.com "), " TEST@Test.com ");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't a string");
         });
     });
