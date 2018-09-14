@@ -387,7 +387,7 @@ const emailAddressValidator = Validator.add({
         if(typeof(value) !== "string"){
             throw new ValueError("Value isn't a string.");
         }
-        const email = String(value).toLowerCase();
+        const email = String(value).trim();
         if(email.indexOf("@") < 0){
             throw new ValueError("Value does not contain a '@' character.");
         }
