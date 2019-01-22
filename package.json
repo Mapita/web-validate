@@ -27,7 +27,9 @@
   },
   "main": "src/index.js",
   "files": [
-    "src"
+    "readme.md",
+    "LICENSE",
+    "dist/*"
   ],
   "repository": {
     "type": "git",
