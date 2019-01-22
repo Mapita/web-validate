@@ -50,14 +50,14 @@ web-friendly documentation for these wrapped endpoints.
 - [Full API documentation](#full-api-documentation)
     - [validate.value](#validatevalue)
     - [validate.strict](#validatestrict)
-    - [validate.Error](#validateerror)
+    - [validate.ValidationError](#validatevalidationerror)
     - [validate.copyWithoutSensitive](#validatecopywithoutsensitive)
     - [validate.Validator](#validatevalidator)
     - [validate.addValidator](#validateaddvalidator)
     - [validate.getValidator](#validategetvalidator)
     - [validate.removeValidator](#validateremovevalidator)
     - [validate.ValueError](#validatevalueerror)
-    - [validate.Path](#validatepath)
+    - [validate.ValidationPath](#validatevalidationpath)
 
 ## Installation
 
@@ -131,7 +131,7 @@ const x = validate.value(specification, 0.5);
 const y = validate.value(specification, "0.5");
 
 // ERROR! Number is outside the specified range.
-// Throws a validate.Error instance:
+// Throws a validate.ValidationError instance:
 // "Expected a finite number that is at least 0 and at most 1: Number is too large."
 const NOPE = validate.value(specification, 100);
 
@@ -141,7 +141,7 @@ const NOPE = validate.value(specification, 100);
 const z = validate.strict(specification, 0.5);
 
 // ERROR! Strict mode doesn't coerce values to the expected type.
-// Throws a validate.Error instance:
+// Throws a validate.ValidationError instance:
 // "Expected a finite number that is at least 0 and at most 1: Value isn't numeric."
 const NOPE = validate.strict(specification, "0.5");
 ```
@@ -658,9 +658,9 @@ with the same arguments and with `strict` set to true.
 See the [`validate.value`](#validatevalue) documentation for more
 information regarding how both of these functions behave.
 
-### validate.Error
+### validate.ValidationError
 
-The `validate.Error` or `ValidationError` type is thrown by
+The `validate.ValidationError` type is thrown by
 the `validate.value` and `validate.strict` functions when an input
 fails to meet the specification.
 
@@ -734,7 +734,7 @@ overlap with any other validators. This option is mandatory.
 specification object that may include additional parameters other
 than what was needed to specify the validator type, the `value`
 argument is the input value that should be validated against
-the specification, the `path` argument is some `validate.Path`
+the specification, the `path` argument is some `validate.ValidationPath`
 instance describing the current location in an input object,
 and the `strict` argument indicates whether validation should be
 performed strictly (when truthy) or permissively (when falsey).
@@ -826,15 +826,15 @@ that you are referring to when you use strings like `"boolean"` and
 `"number"` in specification objects.)
 
 This is one of two error types exported by the web-validate package.
-The other error type is [validate.Error](#validateerror).
+The other error type is [validate.ValidationError](#validatevalidationerror).
 
 You should never need to catch ValueErrors, but you will need to throw
 them to indicate that an input value doesn't meet the specification
 in a custom Validator.
 
-### validate.Path
+### validate.ValidationPath
 
-The `validate.Path` or `ValidationPath` type is used internally to
+The `validate.ValidationPath` type is used internally to
 keep track where in an object validation is taking place. When a
 validation error occurs, this path is included in the error message
 so that it's clear what part of the input object caused the error.
