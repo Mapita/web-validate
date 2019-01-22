@@ -1,6 +1,6 @@
 {
   "name": "web-validate",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Validate API requests and responses.",
   "keywords": [
     "api",
@@ -18,10 +18,12 @@
   "homepage": "https://github.com/Mapita/web-validate",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^10.12.18",
     "canary-test": "1.1.0",
     "dayjs": "1.6.9",
     "luxon": "1.2.1",
-    "moment": "2.22.2"
+    "moment": "2.22.2",
+    "typescript": "^3.2.4"
   },
   "main": "src/index.js",
   "files": [
@@ -42,7 +44,8 @@
     }
   ],
   "scripts": {
-    "test": "node test/canary-test.js",
+    "build": "./node_modules/.bin/tsc",
+    "test": "npm run build && node test/canary-test.js",
     "prepublish": "npm test"
   }
 }
