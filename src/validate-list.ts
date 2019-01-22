@@ -1,9 +1,16 @@
-const Validator = require("./validator");
-const validateValue = require("./validate-value");
-const ValueError = require("./value-error");
+import {SpecificationObject} from "./specification";
+import {ValidationPath} from "./validation-path";
+import {Validator} from "./validator";
+import {validateValue} from "./validate-value";
+import {ValueError} from "./value-error";
 
 // Helper to validate a list of values
-function validateList(specification, list, path, strict){
+export function validateList(
+    specification: SpecificationObject,
+    list: any,
+    path: ValidationPath,
+    strict: boolean
+): any[] {
     path = path || new ValidationPath();
     // Check that the input is really some kind of list (i.e. is iterable)
     if(!list || !list[Symbol.iterator] ||
@@ -13,22 +20,24 @@ function validateList(specification, list, path, strict){
         throw new ValueError("Value isn't a list.");
     }
     // Verifies that the "each" validator is ok, if given
-    const eachValidator = (
+    const eachValidator: Validator | null = (
         specification.each && Validator.get(specification.each)
-    );
+    ) || null;
     // This is the validated array that will be returned
-    const validatedArray = [];
+    const validatedArray: any[] = [];
     // Decide on max length - use a default if unspecified to guard against
     // the possibility of an infinite iterator
-    const maxLength = (Number.isNaN(+specification.maxLength) ?
+    const maxLength: number = (Number.isNaN(+specification.maxLength) ?
         validateList.defaultMaxLength : +specification.maxLength
     );
     // Validate each element in the list
-    for(let element of list){
+    for(let element of <Iterable<any>> list){
         if(eachValidator){
-            const nextPath = path.getNextPath(validatedArray.length);
+            const nextPath: ValidationPath = path.getNextPath(
+                validatedArray.length
+            );
             validatedArray.push(validateValue(
-                specification.each, element, nextPath, strict
+                specification.each!, element, nextPath, strict
             ));
         }else{
             validatedArray.push(element);
@@ -41,6 +50,8 @@ function validateList(specification, list, path, strict){
     return validatedArray;
 }
 
-validateList.defaultMaxLength = 1000;
+export namespace validateList {
+    export const defaultMaxLength = 1000;
+}
 
-module.exports = validateList;
+export default validateList;

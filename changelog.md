@@ -1,3 +1,9 @@
+# v0.3.0
+
+Sixth release. 22 January 2018.
+
+- Converted source to TypeScript; package now includes TS definitions.
+
 # v0.2.0
 
 Fifth release. 14 September 2018.

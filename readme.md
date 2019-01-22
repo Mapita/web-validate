@@ -82,6 +82,18 @@ JavaScript project using CommonJS, like so:
 const validate = require("web-validate");
 ```
 
+Or as an ES6 module:
+
+``` text
+import * as validate from "web-validate";
+```
+
+The package's default exported declaration is the `validate.value` function:
+
+``` text
+import validateValue from "web-validate";
+```
+
 ### Strict vs. permissive validation
 
 Usually, you will only need to use the `validate.value` and
@@ -102,6 +114,8 @@ input object, sometimes with type-coerced members.
 ### Example code
 
 ``` js
+const validate = require("web-validate");
+
 // Describes a number in the range [0, 1]
 const specification = {
     "type": "number",
@@ -586,7 +600,7 @@ const objSpec = {
 value = validate.value(listSpec, {
     "greeting": "hello",
     "location": "world",
-}););
+});
 ```
 
 ## Full API documentation

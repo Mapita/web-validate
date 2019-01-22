@@ -1,4 +1,5 @@
-function englishList(items, conjunction = "and"){
+// Helper to construct a grammatically valid comma-separated list
+export function englishList(items: any[], conjunction: string = "and"): string {
     if(!items || !items.length){
         return "";
     }else if(items.length === 1){
@@ -13,4 +14,4 @@ function englishList(items, conjunction = "and"){
     }
 }
 
-module.exports = englishList;
+export default englishList;
