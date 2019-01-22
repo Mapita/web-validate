@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const is_strict_1 = require("./is-strict");
 const validator_1 = require("./validator");
 // Create a copy of an object with sensitive fields removed
 function copyWithoutSensitive(specification, value) {
-    if (!is_strict_1.isStrict && arguments.length < 2) {
+    if (arguments.length < 2) {
         throw new Error("Function requires at least two arguments.");
     }
     if (!specification || (typeof (specification) !== "object" && typeof (specification) !== "string")) {

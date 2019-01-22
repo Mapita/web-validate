@@ -1,4 +1,3 @@
-import {isStrict} from "./is-strict";
 import {Specification, SpecificationObject} from "./specification";
 import {Validator} from "./validator";
 import {ValueError} from "./value-error";
@@ -17,7 +16,7 @@ export function validateValue(
     path: ValidateValuePath = null,
     strict: boolean = false
 ): any {
-    if(!isStrict && arguments.length < 2){
+    if(arguments.length < 2){
         throw new Error("Function requires at least two arguments.");
     }
     // Verify that some kind of spec was given

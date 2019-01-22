@@ -18,8 +18,6 @@ exports.validateObject = validate_object_1.validateObject;
 // Copy without sensitive fields
 var sensitive_copy_1 = require("./sensitive-copy");
 exports.copyWithoutSensitive = sensitive_copy_1.copyWithoutSensitive;
-// Declarations used within this file
-const is_strict_1 = require("./is-strict");
 const validate_value_2 = require("./validate-value");
 const validator_2 = require("./validator");
 // Add default validators
@@ -28,7 +26,7 @@ require("./default-validators");
 // Same as validateValue except the final "strict" boolean argument
 // is always true.
 function validateValueStrict(specification, value, path) {
-    if (!is_strict_1.isStrict && arguments.length < 2) {
+    if (arguments.length < 2) {
         throw new Error("Function requires at least two arguments.");
     }
     return validate_value_2.validateValue(specification, value, path, true);

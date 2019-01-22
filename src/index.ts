@@ -14,7 +14,6 @@ export {validateObject} from "./validate-object";
 export {copyWithoutSensitive} from "./sensitive-copy";
 
 // Declarations used within this file
-import {isStrict} from "./is-strict";
 import {Specification} from "./specification";
 import {validateValue, ValidateValuePath} from "./validate-value";
 import {Validator} from "./validator";
@@ -28,7 +27,7 @@ import "./default-validators";
 export function validateValueStrict(
     specification: Specification, value: any, path: ValidateValuePath
 ): any {
-    if(!isStrict && arguments.length < 2){
+    if(arguments.length < 2){
         throw new Error("Function requires at least two arguments.");
     }
     return validateValue(specification, value, path, true);

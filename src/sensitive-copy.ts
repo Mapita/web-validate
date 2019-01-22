@@ -1,4 +1,3 @@
-import {isStrict} from "./is-strict";
 import {Specification, SpecificationObject} from "./specification";
 import {Validator} from "./validator";
 
@@ -6,7 +5,7 @@ import {Validator} from "./validator";
 export function copyWithoutSensitive(
     specification: Specification, value: any
 ): any {
-    if(!isStrict && arguments.length < 2){
+    if(arguments.length < 2){
         throw new Error("Function requires at least two arguments.");
     }
     if(!specification || (

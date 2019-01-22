@@ -1,13 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const is_strict_1 = require("./is-strict");
 const validator_1 = require("./validator");
 const value_error_1 = require("./value-error");
 const validation_error_1 = require("./validation-error");
 const validation_path_1 = require("./validation-path");
 // Validate a single value of any type
 function validateValue(specification, value, path = null, strict = false) {
-    if (!is_strict_1.isStrict && arguments.length < 2) {
+    if (arguments.length < 2) {
         throw new Error("Function requires at least two arguments.");
     }
     // Verify that some kind of spec was given
