@@ -1,9 +1,16 @@
-const Validator = require("./validator");
-const validateValue = require("./validate-value");
-const ValueError = require("./value-error");
+import {Specification, SpecificationObject} from "./specification";
+import {ValidationPath} from "./validation-path";
+import {Validator} from "./validator";
+import {validateValue} from "./validate-value";
+import {ValueError} from "./value-error";
 
 // Helper to validate an object
-function validateObject(specification, object, path, strict){
+export function validateObject(
+    specification: SpecificationObject,
+    object: any,
+    path: ValidationPath,
+    strict: boolean
+): {[key: string]: any} {
     path = path || new ValidationPath();
     // Check that the input is really some kind of object
     if(object === null || object === undefined ||
@@ -23,14 +30,16 @@ function validateObject(specification, object, path, strict){
         );
     }
     // This is the validated object that will be returned
-    const validatedObject = {};
+    const validatedObject: {[key: string]: any} = {};
     // Handle missing attributes
     for(let key in specification.attributes){
-        if(object.hasOwnProperty(key)) continue;
-        const attrSpecRaw = specification.attributes[key];
-        const attrValidator = Validator.get(attrSpecRaw);
+        if(object.hasOwnProperty(key)){
+            continue;
+        }
+        const attrSpecRaw: Specification = specification.attributes[key];
+        const attrValidator: Validator = Validator.get(attrSpecRaw);
         const attrSpec = (typeof(attrSpecRaw) === "string" ?
-            {"type": attrSpecRaw} : attrSpecRaw
+            <SpecificationObject> {"type": attrSpecRaw} : attrSpecRaw
         );
         if(!attrSpec.optional && !("default" in attrSpec)){
             throw new ValueError(`Missing required attribute "${key}".`);
@@ -46,10 +55,12 @@ function validateObject(specification, object, path, strict){
     }
     // Validate present attributes
     for(let key in object){
-        if(!object.hasOwnProperty(key)) continue;
+        if(!object.hasOwnProperty(key)){
+            continue;
+        }
         if(specification.attributes[key] || specification.keepUnlistedAttributes){
-            const attrSpec = specification.attributes[key];
-            const nextPath = path.getNextPath(key);
+            const attrSpec: Specification = specification.attributes[key];
+            const nextPath: ValidationPath = path.getNextPath(key);
             validatedObject[key] = !attrSpec ? object[key] : validateValue(
                 attrSpec, object[key], nextPath, strict
             );
@@ -61,4 +72,4 @@ function validateObject(specification, object, path, strict){
     return validatedObject;
 }
 
-module.exports = validateObject;
+export default validateObject;

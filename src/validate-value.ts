@@ -1,11 +1,23 @@
-const Validator = require("./validator");
-const ValueError = require("./value-error");
-const ValidationError = require("./validation-error");
-const ValidationPath = require("./validation-path");
+import {isStrict} from "./is-strict";
+import {Specification, SpecificationObject} from "./specification";
+import {Validator} from "./validator";
+import {ValueError} from "./value-error";
+import {ValidationError} from "./validation-error";
+import {ValidationPath, ValidationPathAttribute} from "./validation-path";
+
+// All types accepted as input for the validateValue "path" parameter
+export type ValidateValuePath = (
+    null | undefined | ValidationPath | ValidationPathAttribute
+);
 
 // Validate a single value of any type
-function validateValue(specification, value, path, strict){
-    if(arguments.length < 2){
+export function validateValue(
+    specification: Specification,
+    value: any,
+    path: ValidateValuePath = null,
+    strict: boolean = false
+): any {
+    if(!isStrict && arguments.length < 2){
         throw new Error("Function requires at least two arguments.");
     }
     // Verify that some kind of spec was given
@@ -16,10 +28,10 @@ function validateValue(specification, value, path, strict){
         throw new Error("Validation requires a specification object.");
     }
     if(typeof(specification) === "string"){
-        specification = {"type": specification};
+        specification = <SpecificationObject> {"type": specification};
     }
     // Get a Validator instance given the specification
-    let validator;
+    let validator: Validator;
     try{
         validator = Validator.get(specification);
     }catch(error){
@@ -30,9 +42,9 @@ function validateValue(specification, value, path, strict){
     }
     // Get a ValidatorPath instance
     if(typeof(path) === "string" || typeof(path) === "number"){
-        path = new ValidationPath(path);
+        path = new ValidationPath(null, path);
     }else if(!path){
-        path = new ValidationPath(null, validator.defaultPath);
+        path = new ValidationPath(null, validator.defaultPath || "");
     }
     if(!(path instanceof ValidationPath)) throw new Error(
         "Path argument must produce a ValidationPath instance."
@@ -55,7 +67,9 @@ function validateValue(specification, value, path, strict){
                 specification, value, path, strict,
                 validator, error && error.message
             );
-            Error.captureStackTrace(throwError, arguments.callee);
+            if(typeof(Error.captureStackTrace) === "function") {
+                Error.captureStackTrace(throwError, validateValue);
+            }
             throw throwError;
         // Escalate ValidationErrors up to the caller
         // All other errors are presumably either incorrect usage or
@@ -66,4 +80,4 @@ function validateValue(specification, value, path, strict){
     }
 }
 
-module.exports = validateValue;
+export default validateValue;
