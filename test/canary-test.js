@@ -1020,4 +1020,4 @@ function makeTests(validate){
 
 module.exports = makeTests;
 
-makeTests(require("../src/index.js")).doReport();
+makeTests(require("../dist/index")).doReport();
