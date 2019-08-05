@@ -35,7 +35,7 @@ export function validateValue(
         validator = Validator.get(specification);
     }catch(error){
         if(path) error.message = (
-            error.message.slice(-1) + " at " + path.toString()
+            error.message.slice(0, error.message.length - 1) + " at " + path.toString()
         );
         throw error;
     }
