@@ -1,3 +1,10 @@
+# v0.3.1
+
+Seventh release. 20 August 2019.
+
+- String validator now normalizes unicode.
+- Fix accidentally uninformative error messages for some inputs.
+
 # v0.3.0
 
 Sixth release. 22 January 2019.
