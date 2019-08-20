@@ -368,7 +368,9 @@ export const stringValidator = Validator.add({
         if(typeof(value) !== "string"){
             throw new ValueError("Value isn't a string.");
         }
-        value = validateListLength("String", specification, value);
+        value = validateListLength(
+            "String", specification, value.normalize()
+        );
         if(specification.pattern){
             const match = value.match(specification.pattern);
             if(!match || !match[0] || match[0].length !== value.length){
