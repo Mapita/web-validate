@@ -1,3 +1,9 @@
+# v0.3.2
+
+Eighth release. 20 August 2019.
+
+- Fix issue with "main" path in package.json.
+
 # v0.3.1
 
 Seventh release. 20 August 2019.
