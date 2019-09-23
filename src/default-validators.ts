@@ -600,6 +600,6 @@ export const objectValidator = Validator.add({
                 object[key] = value[key];
             }
         }
-        return anyInsensitive ? object : undefined;
+        return anyInsensitive ? object : {};
     },
 });

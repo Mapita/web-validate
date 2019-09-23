@@ -3,6 +3,7 @@
 Ninth release. 23 September 2019.
 
 - Fix missing default argument for the "strict" function.
+- Improve behavior of "copyWithSensitive" for object inputs.
 
 # v0.3.2
 

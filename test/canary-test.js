@@ -889,7 +889,10 @@ function makeTests(validate){
                     "b": {"type": "number", "sensitive": true},
                 },
             };
-            assert.equal(validate.copyWithoutSensitive(objAllSpec, undefined));
+            assert.deepEqual(validate.copyWithoutSensitive(objAllSpec, {
+                "a": true,
+                "b": 1234,
+            }), {});
         });
         this.test("object with some sensitive attributes", function(){
             const objSomeSpec = {
