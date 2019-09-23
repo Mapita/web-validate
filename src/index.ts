@@ -25,7 +25,7 @@ import "./default-validators";
 // Same as validateValue except the final "strict" boolean argument
 // is always true.
 export function validateValueStrict(
-    specification: Specification, value: any, path: ValidateValuePath
+    specification: Specification, value: any, path: ValidateValuePath = null
 ): any {
     if(arguments.length < 2){
         throw new Error("Function requires at least two arguments.");

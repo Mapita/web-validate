@@ -1,3 +1,9 @@
+# v0.3.3
+
+Ninth release. 23 September 2019.
+
+- Fix missing default argument for the "strict" function.
+
 # v0.3.2
 
 Eighth release. 20 August 2019.
