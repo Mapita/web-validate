@@ -1,3 +1,9 @@
+# v0.3.4
+
+Tenth release. 2 July 2020.
+
+- Object and list validators now coerce JSON strings when not set to strict.
+
 # v0.3.3
 
 Ninth release. 23 September 2019.

@@ -12,6 +12,17 @@ export function validateObject(
     strict: boolean
 ): {[key: string]: any} {
     path = path || new ValidationPath();
+    // Detect and coerce a JSON-encoded object
+    if(!strict && typeof(object) === "string" &&
+        object[0] === "{" && object[object.length - 1] === "}"
+    ) {
+        try {
+            object = JSON.parse(object);
+        }
+        catch(error) {
+            throw new ValueError("Value isn't an object.");
+        }
+    }
     // Check that the input is really some kind of object
     if(object === null || object === undefined ||
         typeof(object) !== "object"

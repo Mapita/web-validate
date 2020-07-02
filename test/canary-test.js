@@ -468,7 +468,9 @@ function makeTests(validate){
         const spec = {"type": "list"};
         this.test("normal", function(){
             assert.deepEqual(validate.value(spec, []), []);
+            assert.deepEqual(validate.value(spec, "[]"), []);
             assert.deepEqual(validate.value(spec, [1, 2, 3]), [1, 2, 3]);
+            assert.deepEqual(validate.value(spec, "[1, 2, 3]"), [1, 2, 3]);
             throwsErrorWith(() => validate.value(spec, null), "Value isn't a list");
             throwsErrorWith(() => validate.value(spec, 12345), "Value isn't a list");
             throwsErrorWith(() => validate.value(spec, "hi"), "Value isn't a list");
@@ -477,6 +479,8 @@ function makeTests(validate){
         this.test("strict", function(){
             assert.deepEqual(validate.strict(spec, []), []);
             assert.deepEqual(validate.strict(spec, [1, 2, 3]), [1, 2, 3]);
+            throwsErrorWith(() => validate.strict(spec, "[]"), "Value isn't a list");
+            throwsErrorWith(() => validate.strict(spec, "[1, 2, 3]"), "Value isn't a list");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't a list");
             throwsErrorWith(() => validate.strict(spec, 12345), "Value isn't a list");
             throwsErrorWith(() => validate.strict(spec, "hi"), "Value isn't a list");
@@ -559,7 +563,9 @@ function makeTests(validate){
         const spec = {"type": "object"};
         this.test("normal", function(){
             assert.deepEqual(validate.value(spec, {}), {});
+            assert.deepEqual(validate.value(spec, "{}"), {});
             assert.deepEqual(validate.value(spec, {"a": "b", "c": "d"}), {"a": "b", "c": "d"});
+            assert.deepEqual(validate.value(spec, '{"a": "b", "c": "d"}'), {"a": "b", "c": "d"});
             throwsErrorWith(() => validate.value(spec, null), "Value isn't an object");
             throwsErrorWith(() => validate.value(spec, 12345), "Value isn't an object");
             throwsErrorWith(() => validate.value(spec, "hi"), "Value isn't an object");
@@ -567,6 +573,8 @@ function makeTests(validate){
         this.test("strict", function(){
             assert.deepEqual(validate.strict(spec, {}), {});
             assert.deepEqual(validate.strict(spec, {"a": "b", "c": "d"}), {"a": "b", "c": "d"});
+            throwsErrorWith(() => validate.strict(spec, "{}"), "Value isn't an object");
+            throwsErrorWith(() => validate.strict(spec, '{"a": "b", "c": "d"}'), "Value isn't an object");
             throwsErrorWith(() => validate.strict(spec, null), "Value isn't an object");
             throwsErrorWith(() => validate.strict(spec, 12345), "Value isn't an object");
             throwsErrorWith(() => validate.strict(spec, "hi"), "Value isn't an object");

@@ -1,6 +1,6 @@
 {
   "name": "web-validate",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Validate API requests and responses.",
   "keywords": [
     "api",

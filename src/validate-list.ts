@@ -12,6 +12,17 @@ export function validateList(
     strict: boolean
 ): any[] {
     path = path || new ValidationPath();
+    // Detect and coerce a JSON-encoded array
+    if(!strict && typeof(list) === "string" &&
+        list[0] === "[" && list[list.length - 1] === "]"
+    ) {
+        try {
+            list = JSON.parse(list);
+        }
+        catch(error) {
+            throw new ValueError("Value isn't a list.");
+        }
+    }
     // Check that the input is really some kind of list (i.e. is iterable)
     if(!list || !list[Symbol.iterator] ||
         typeof(list[Symbol.iterator]) !== "function" ||
