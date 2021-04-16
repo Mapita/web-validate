@@ -41,6 +41,7 @@ web-friendly documentation for these wrapped endpoints.
     - [number](#number)
     - [integer](#integer)
     - [index](#index)
+    - [bigint](#bigint)
     - [string](#string)
     - [email](#email)
     - [timestamp](#timestamp)
@@ -429,6 +430,20 @@ allowed for the value.
 
 ``` js
 value = validate.value("index", 1);
+```
+
+### bigint
+
+The **index** validator expects an arbitrarily large integer value.
+When used permissively, strings and numbers are coerced to `BigInt` values.
+When used strictly, strings or numbers are not accepted, only `BigInt` values.
+
+The validator recognizes `minimum` and `maximum` parameters in the
+specification object. When provided as either numbers or `BigInt` values,
+they describe the inclusive bounds allowed for the value.
+
+``` js
+value = validate.value("bigint", 1n);
 ```
 
 ### string
