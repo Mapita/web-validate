@@ -1,3 +1,10 @@
+# v0.4.0
+
+Eleventh release. 16 April 2021.
+
+- Add a "bigint" default validator.
+- Update dependency versions.
+
 # v0.3.4
 
 Tenth release. 2 July 2020.
