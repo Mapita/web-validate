@@ -19,11 +19,36 @@ export function describeNumberValidator(
     const max: number = +specification.maximum;
     if(Number.isFinite(min) && Number.isFinite(max)){
         return `${name} that is at least ${min} and at most ${max}`;
-    }else if(Number.isFinite(min)){
+    }
+    else if(Number.isFinite(min)){
         return `${name} that is at least ${min}`;
-    }else if(Number.isFinite(max)){
+    }
+    else if(Number.isFinite(max)){
         return `${name} that is at most ${max}`;
-    }else{
+    }
+    else{
+        return `${name}`;
+    }
+}
+
+// Helper for bigint validators
+export function describeBigIntValidator(
+    name: string, specification: SpecificationObject
+): string {
+    const min: bigint | null | undefined = specification.minimum;
+    const max: bigint | null | undefined = specification.maximum;
+    const hasMin = typeof(min) === "bigint" || typeof(min) === "number";
+    const hasMax = typeof(max) === "bigint" || typeof(max) === "number";
+    if(hasMin && hasMax){
+        return `${name} that is at least ${min} and at most ${max}`;
+    }
+    else if(hasMin){
+        return `${name} that is at least ${min}`;
+    }
+    else if(hasMax){
+        return `${name} that is at most ${max}`;
+    }
+    else{
         return `${name}`;
     }
 }
@@ -329,6 +354,53 @@ export const indexValidator = Validator.add({
             throw new ValueError("Value is less than zero.");
         }
         return number;
+    },
+});
+
+export const bigintValidator = Validator.add({
+    name: "bigint",
+    defaultValue: 0n,
+    parameters: {
+        "minimum": "The minimum allowed value for the BigInt number.",
+        "maximum": "The maximum allowed value for the BigInt number.",
+    },
+    describe: function(specification){
+        return describeBigIntValidator("a BigInt numeric value", specification);
+    },
+    validate: function(specification, value, path, strict){
+        let bigint: bigint | undefined = undefined;
+        if(typeof(value) === "bigint") {
+            bigint = value;
+        }
+        else if(strict) {
+            throw new ValueError("Value isn't a BigInt.");
+        }
+        try {
+            bigint = BigInt(value);
+        }
+        catch(error) {
+            // Do nothing
+        }
+        if(value === "" || typeof(bigint) !== "bigint") {
+            throw new ValueError("Value couldn't be converted to a BigInt number.");
+        }
+        if((
+            typeof(specification.minimum) === "bigint" ||
+            typeof(specification.minimum) === "number"
+        ) &&
+            bigint < specification.minimum
+        ){
+            throw new ValueError("BigInt number is too small.");
+        }
+        if((
+            typeof(specification.maximum) === "bigint" ||
+            typeof(specification.maximum) === "number"
+        ) &&
+            bigint > specification.maximum
+        ){
+            throw new ValueError("BigInt number is too large.");
+        }
+        return bigint;
     },
 });
 

@@ -219,6 +219,43 @@ function makeTests(validate){
         });
     });
     
+    canary.group("bigint validator", function(){
+        const spec = {"type": "bigint"};
+        this.test("normal", function(){
+            assert.equal(validate.value(spec, 0n), 0n);
+            assert.equal(validate.value(spec, 150), 150n);
+            assert.equal(validate.value(spec, "-20"), -20n);
+            assert.equal(validate.value(spec, 99999999999999999n), 99999999999999999n);
+            throwsErrorWith(() => validate.value(spec, ""), "Value couldn't be converted to a BigInt number.");
+            throwsErrorWith(() => validate.value(spec, NaN), "Value couldn't be converted to a BigInt number.");
+            throwsErrorWith(() => validate.value(spec, Infinity), "Value couldn't be converted to a BigInt number.");
+            throwsErrorWith(() => validate.value(spec, "nope"), "Value couldn't be converted to a BigInt number.");
+        });
+        this.test("strict", function(){
+            assert.equal(validate.strict(spec, 0n), 0n);
+            assert.equal(validate.strict(spec, 150n), 150n);
+            assert.equal(validate.strict(spec, -20n), -20n);
+            assert.equal(validate.strict(spec, 99999999999999999n), 99999999999999999n);
+            throwsErrorWith(() => validate.strict(spec, "0"), "Value isn't a BigInt.");
+            throwsErrorWith(() => validate.strict(spec, 150), "Value isn't a BigInt.");
+            throwsErrorWith(() => validate.strict(spec, "-20"), "Value isn't a BigInt.");
+        });
+        this.test("bounds", function(){
+            const boundSpec = {"type": "bigint", "minimum": 0, "maximum": 99999999999999999n};
+            assert.equal(validate.strict(boundSpec, 0n), 0n);
+            assert.equal(validate.strict(boundSpec, 50n), 50n);
+            assert.equal(validate.strict(boundSpec, 99999999999999999n), 99999999999999999n);
+            throwsErrorWith(() => validate.strict(boundSpec, -2n),
+                "Expected a BigInt numeric value that is at least 0 " +
+                "and at most 99999999999999999: BigInt number is too small."
+            );
+            throwsErrorWith(() => validate.strict(boundSpec, 199999999999999999n),
+                "Expected a BigInt numeric value that is at least 0 " +
+                "and at most 99999999999999999: BigInt number is too large."
+            );
+        });
+    });
+    
     canary.group("string validator", function(){
         const spec = {"type": "string"};
         this.test("normal", function(){
