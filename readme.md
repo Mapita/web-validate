@@ -377,8 +377,9 @@ value = validate.value("boolean", true);
 ### numeric
 
 The **numeric** validator expects any numeric value, including infinity or
-NaN. When used permissively, strings that look like numbers are parsed and
-outputted as numeric values. When used strictly, strings are not accepted.
+NaN.
+When used permissively, strings that look like numbers are parsed and
+outputted as numeric values, and `BigInt` values are coerced to numbers. When used strictly, strings or `BigInt` values are not accepted.
 
 The validator recognizes `minimum` and `maximum` parameters in the
 specification object. When provided, they describe the inclusive bounds
@@ -393,7 +394,7 @@ value = validate.value("numeric", 1);
 The **number** validator expects any finite numeric value. (This does not
 include infinity or NaN; these inputs produce errors.)
 When used permissively, strings that look like numbers are parsed and
-outputted as numeric values. When used strictly, strings are not accepted.
+outputted as numeric values, and `BigInt` values are coerced to numbers. When used strictly, strings or `BigInt` values are not accepted.
 
 The validator recognizes `minimum` and `maximum` parameters in the
 specification object. When provided, they describe the inclusive bounds
@@ -407,7 +408,7 @@ value = validate.value("number", 1);
 
 The **integer** validator expects an integral numeric value.
 When used permissively, strings that look like numbers are parsed and
-outputted as numeric values. When used strictly, strings are not accepted.
+outputted as numeric values, and `BigInt` values are coerced to numbers. When used strictly, strings or `BigInt` values are not accepted.
 
 The validator recognizes `minimum` and `maximum` parameters in the
 specification object. When provided, they describe the inclusive bounds
@@ -422,7 +423,7 @@ value = validate.value("integer", 1);
 The **index** validator expects a non-negative integral numeric value, i.e.
 an array index, meaning an integer not less than zero.
 When used permissively, strings that look like numbers are parsed and
-outputted as numeric values. When used strictly, strings are not accepted.
+outputted as numeric values, and `BigInt` values are coerced to numbers. When used strictly, strings or `BigInt` values are not accepted.
 
 The validator recognizes `minimum` and `maximum` parameters in the
 specification object. When provided, they describe the inclusive bounds
