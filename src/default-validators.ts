@@ -257,7 +257,8 @@ export const numericValidator = Validator.add({
     },
     validate: function(specification, value, path, strict){
         const number: number = strict ? value : (
-            typeof(value) === "string" ? +value : value
+            typeof(value) === "string" || typeof(value) === "bigint" ?
+            Number(value) : value
         );
         if(typeof(number) !== "number" || (
             number !== number && (value === value && value !== "NaN")
