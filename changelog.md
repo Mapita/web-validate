@@ -1,3 +1,9 @@
+# v0.4.1
+
+Eleventh release. 21 April 2021.
+
+- Numeric validators now coerce BigInts when not set to strict.
+
 # v0.4.0
 
 Eleventh release. 16 April 2021.

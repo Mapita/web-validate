@@ -84,6 +84,7 @@ function makeTests(validate){
             assert.equal(validate.value(spec, 0), 0);
             assert.equal(validate.value(spec, 1.5), 1.5);
             assert.equal(validate.value(spec, "-20"), -20);
+            assert.equal(validate.value(spec, 500n), 500);
             assert.equal(validate.value(spec, Infinity), Infinity);
             assertIsNaN(validate.value(spec, NaN));
             assertIsNaN(validate.value(spec, "NaN"));
