@@ -22,7 +22,7 @@
     "canary-test": "^1.1.2",
     "dayjs": "1.6.9",
     "luxon": "1.2.1",
-    "moment": "2.22.2",
+    "moment": "2.29.2",
     "typescript": "4.2.4"
   },
   "main": "dist/index.js",
